@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>TLAdmin 接口调试台</title>
+  <link rel="stylesheet" href="/static/swagger-ui/swagger-ui.css">
+  <style>
+    body { margin: 0; }
+    .topbar { display: none; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="/static/swagger-ui/swagger-ui-bundle.js"></script>
+  <script src="/static/swagger-ui/swagger-ui-standalone-preset.js"></script>
+  <script>
+    console.log('少说多做,持续学习');
+    // TLAdmin OpenAPI 调试台:支持填写 Bearer Token(Authorize 按钮)调试接口,
+    // 每个接口带 format=json|xml 参数验证双格式响应。Author: qiufeng
+    window.onload = () => {
+      window.ui = SwaggerUIBundle({
+        url: '/adminapi/openapi.json',
+        dom_id: '#swagger-ui',
+        presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+        layout: 'BaseLayout',
+        persistAuthorization: true,
+        displayRequestDuration: true,
+        tryItOutEnabled: true,
+      });
+    };
+  </script>
+</body>
+</html>

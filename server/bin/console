@@ -1,0 +1,161 @@
+#!/usr/bin/env php
+<?php
+
+/**
+ * TLAdmin CLI 入口。
+ *
+ * 用法:
+ *   php bin/console migrate          执行未应用的迁移
+ *   php bin/console migrate:status   查看迁移状态
+ *   php bin/console seed             执行种子数据
+ *   php bin/console route:list       输出注解路由表
+ *   php bin/console route:cache      重建路由缓存
+ * Author: qiufeng
+ */
+
+declare(strict_types=1);
+
+use app\common\config\EnvLoader;
+use app\common\database\DbBootstrap;
+use app\common\database\Migrator;
+use app\common\router\RouteScanner;
+
+$rootPath = dirname(__DIR__);
+require $rootPath . '/vendor/autoload.php';
+
+EnvLoader::load($rootPath . '/.env');
+DbBootstrap::init();
+
+// CLI 里的出站请求同样落第三方请求日志
+\app\common\support\Tools::$httpAfterRequest = static function (array $result): void {
+    (new \app\common\service\log\ThirdPartyLogService())->record($result);
+};
+
+$migrator = new Migrator($rootPath . '/database/migrations', $rootPath . '/database/seeders');
+$command = $argv[1] ?? 'help';
+
+try {
+    switch ($command) {
+        case 'migrate':
+            $executed = $migrator->migrate();
+            echo $executed === []
+                ? "没有待执行的迁移\n"
+                : "已执行迁移:\n  " . implode("\n  ", $executed) . "\n";
+            break;
+
+        case 'migrate:status':
+            $status = $migrator->status();
+            echo "已应用 (" . count($status['applied']) . "):\n";
+            foreach ($status['applied'] as $name) {
+                echo "  [x] {$name}\n";
+            }
+            echo "待执行 (" . count($status['pending']) . "):\n";
+            foreach ($status['pending'] as $name) {
+                echo "  [ ] {$name}\n";
+            }
+            break;
+
+        case 'seed':
+            $executed = $migrator->seed();
+            echo $executed === []
+                ? "没有可执行的种子\n"
+                : "已执行种子:\n  " . implode("\n  ", $executed) . "\n";
+            break;
+
+        case 'route:list':
+            $routes = RouteScanner::scan($rootPath . '/app/adminapi/controller', 'app\\adminapi\\controller');
+            usort($routes, static fn (array $a, array $b): int => [$a[1], $a[0]] <=> [$b[1], $b[0]]);
+            printf("%-7s %-55s %-32s %s\n", 'METHOD', 'PATH', 'PERMISSION', 'SUMMARY');
+            foreach ($routes as [$method, $path, $handler, $meta]) {
+                printf(
+                    "%-7s %-55s %-32s %s\n",
+                    $method,
+                    $path,
+                    ($meta['auth'] ?? true) === false ? '(公开)' : ($meta['permission'] ?? '(登录)'),
+                    $meta['summary'] ?? ''
+                );
+            }
+            echo "共 " . count($routes) . " 条路由\n";
+            break;
+
+        case 'route:cache':
+            $cacheFile = $rootPath . '/runtime/cache/routes.php';
+            if (is_file($cacheFile)) {
+                unlink($cacheFile);
+            }
+            $routes = RouteScanner::scan($rootPath . '/app/adminapi/controller', 'app\\adminapi\\controller', $cacheFile);
+            echo "路由缓存已重建,共 " . count($routes) . " 条路由\n";
+            break;
+
+        case 'schedule:list':
+            $tasks = require $rootPath . '/config/schedule.php';
+            printf("%-20s %-15s %-45s %s\n", 'NAME', 'CRON', 'HANDLER', 'DESCRIPTION');
+            foreach ($tasks as $task) {
+                printf("%-20s %-15s %-45s %s\n", $task['name'] ?? '', $task['cron'] ?? '', $task['handler'] ?? '', $task['description'] ?? '');
+            }
+            break;
+
+        case 'schedule:run':
+            $tasks = require $rootPath . '/config/schedule.php';
+            $results = (new \app\common\schedule\Scheduler($tasks))->run();
+            if ($results === []) {
+                echo date('Y-m-d H:i') . " 没有到期任务\n";
+                break;
+            }
+            foreach ($results as $name => $result) {
+                echo date('Y-m-d H:i') . " {$name}: {$result}\n";
+            }
+            break;
+
+        case 'queue:work':
+            $once = in_array('--once', $argv, true);
+            echo $once ? "消费一条任务…\n" : "队列消费中(Ctrl+C 退出)…\n";
+            $handled = \app\common\queue\Queue::work($once);
+            echo "本次处理 {$handled} 条\n";
+            break;
+
+        case 'queue:size':
+            $size = \app\common\queue\Queue::size();
+            echo "就绪: {$size['ready']} 条,延迟: {$size['delayed']} 条\n";
+            break;
+
+        case 'queue:push-demo':
+            \app\common\queue\Queue::push(\app\job\DemoJob::class, ['message' => $argv[2] ?? 'hello', 'time' => date('H:i:s')]);
+            echo "已入队 DemoJob\n";
+            break;
+
+        case 'gen:crud':
+            $table = $argv[2] ?? '';
+            if ($table === '') {
+                echo "用法: php bin/console gen:crud <表名> [--title=标题] [--force]\n";
+                exit(1);
+            }
+            $title = '';
+            foreach ($argv as $arg) {
+                if (str_starts_with($arg, '--title=')) {
+                    $title = substr($arg, 8);
+                }
+            }
+            $generator = new \app\common\generator\CrudGenerator($rootPath, dirname($rootPath) . '/web');
+            $written = $generator->generate($table, $title, in_array('--force', $argv, true));
+            echo "生成完成:\n  " . implode("\n  ", $written) . "\n";
+            echo "下一步: php bin/console seed 写入菜单,重新登录即可看到新菜单\n";
+            break;
+
+        default:
+            echo "可用命令:\n"
+                . "  migrate          执行未应用的迁移\n"
+                . "  migrate:status   查看迁移状态\n"
+                . "  seed             执行种子数据\n"
+                . "  route:list       输出注解路由表\n"
+                . "  route:cache      重建路由缓存\n"
+                . "  schedule:list    查看定时任务表\n"
+                . "  schedule:run     执行到期定时任务(配合系统 crontab 每分钟调用)\n"
+                . "  queue:work       队列消费(--once 只消费一条)\n"
+                . "  queue:size       查看队列长度\n"
+                . "  queue:push-demo  入队一个示例任务(调试用)\n";
+    }
+} catch (Throwable $e) {
+    fwrite(STDERR, "执行失败: {$e->getMessage()}\n{$e->getTraceAsString()}\n");
+    exit(1);
+}

@@ -1,0 +1,29 @@
+name: Test
+on: [push, pull_request]
+
+jobs:
+  phpunit:
+    name: PHP-${{ matrix.php_version }}-${{ matrix.prefer }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        php_version:
+          - 8.1
+          - 8.2
+          - 8.3
+          - 8.4
+          - 8.5
+        prefer:
+          - stable
+          - lowest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php_version }}
+        coverage: none
+    - name: Install Dependencies
+      run: composer update --prefer-dist --no-interaction --prefer-${{ matrix.prefer }}
+    - name: Run PHPUnit
+      run: ./vendor/bin/phpunit

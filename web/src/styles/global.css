@@ -1,0 +1,19 @@
+/* 全局样式 Author: qiufeng */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  color: var(--td-text-color-primary);
+  background: var(--td-bg-color-page);
+}

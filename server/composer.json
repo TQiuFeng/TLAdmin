@@ -1,0 +1,39 @@
+{
+  "name": "tladmin/server",
+  "description": "TLAdmin ThinkPHP8 admin backend",
+  "type": "project",
+  "license": "proprietary",
+  "require": {
+    "php": ">=8.1",
+    "topthink/framework": "^8.0",
+    "topthink/think-filesystem": "^2.0",
+    "guzzlehttp/guzzle": "^7.8",
+    "nesbot/carbon": "^2.72 || ^3.0",
+    "ramsey/uuid": "^4.7",
+    "illuminate/support": "^10.0 || ^11.0 || ^12.0",
+    "overtrue/pinyin": "^6.0",
+    "yansongda/pay": "^3.7",
+    "w7corp/easywechat": "^6.0",
+    "overtrue/easy-sms": "^2.7 || ^3.0",
+    "aliyuncs/oss-sdk-php": "^2.7",
+    "qcloud/cos-sdk-v5": "^2.6",
+    "qiniu/php-sdk": "^7.13",
+    "zircote/swagger-php": "^4.8",
+    "pragmarx/google2fa": "^9.0",
+    "mongodb/mongodb": "^2.2",
+    "bacon/bacon-qr-code": "^3.0",
+    "phpmailer/phpmailer": "^6.9",
+    "overtrue/php-opencc": "^1.2",
+    "6tail/lunar-php": "^1.4"
+  },
+  "autoload": {
+    "psr-4": {
+      "app\\": "app/"
+    }
+  },
+  "scripts": {
+    "check": [
+      "php -l public/index.php"
+    ]
+  }
+}

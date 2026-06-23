@@ -1,0 +1,125 @@
+<?php
+
+return [
+    'integration' => [
+        'packages' => [
+            'pay' => [
+                'name' => 'yansongda/pay',
+                'class' => \Yansongda\Pay\Pay::class,
+                'title' => '支付',
+            ],
+            'wechat' => [
+                'name' => 'w7corp/easywechat',
+                'class' => \EasyWeChat\OfficialAccount\Application::class,
+                'title' => '微信公众号',
+            ],
+            'wechat_miniapp' => [
+                'name' => 'w7corp/easywechat',
+                'class' => \EasyWeChat\MiniApp\Application::class,
+                'title' => '微信小程序',
+            ],
+            'sms' => [
+                'name' => 'overtrue/easy-sms',
+                'class' => \Overtrue\EasySms\EasySms::class,
+                'title' => '短信',
+            ],
+            'filesystem' => [
+                'name' => 'topthink/think-filesystem',
+                'class' => \think\filesystem\Filesystem::class,
+                'title' => '文件系统',
+            ],
+            'aliyun_oss' => [
+                'name' => 'aliyuncs/oss-sdk-php',
+                'class' => \OSS\OssClient::class,
+                'title' => '阿里云 OSS',
+            ],
+            'tencent_cos' => [
+                'name' => 'qcloud/cos-sdk-v5',
+                'class' => \Qcloud\Cos\Client::class,
+                'title' => '腾讯云 COS',
+            ],
+            'qiniu' => [
+                'name' => 'qiniu/php-sdk',
+                'class' => \Qiniu\Auth::class,
+                'title' => '七牛云',
+            ],
+        ],
+        'schema' => [
+            'pay' => [
+                ['field' => 'default_provider', 'label' => '默认支付渠道', 'type' => 'select', 'options' => ['wechat', 'alipay'], 'secret' => false],
+                ['field' => 'wechat.mch_id', 'label' => '微信支付商户号', 'type' => 'text', 'secret' => false],
+                ['field' => 'wechat.mch_secret_key', 'label' => '微信支付 API 密钥', 'type' => 'password', 'secret' => true],
+                ['field' => 'wechat.mch_secret_cert', 'label' => '微信支付商户证书', 'type' => 'textarea', 'secret' => true],
+                ['field' => 'wechat.mch_public_cert_path', 'label' => '微信支付平台证书路径', 'type' => 'text', 'secret' => false],
+                ['field' => 'alipay.app_id', 'label' => '支付宝 AppID', 'type' => 'text', 'secret' => false],
+                ['field' => 'alipay.app_secret_cert', 'label' => '支付宝应用私钥', 'type' => 'textarea', 'secret' => true],
+                ['field' => 'alipay.alipay_public_cert_path', 'label' => '支付宝公钥证书路径', 'type' => 'text', 'secret' => false],
+                ['field' => 'notify_url', 'label' => '支付回调地址', 'type' => 'text', 'secret' => false],
+                ['field' => 'return_url', 'label' => '支付同步跳转地址', 'type' => 'text', 'secret' => false],
+            ],
+            'wechat' => [
+                ['field' => 'app_id', 'label' => 'AppID', 'type' => 'text', 'secret' => false],
+                ['field' => 'secret', 'label' => 'AppSecret', 'type' => 'password', 'secret' => true],
+                ['field' => 'token', 'label' => 'Token', 'type' => 'password', 'secret' => true],
+                ['field' => 'aes_key', 'label' => 'EncodingAESKey', 'type' => 'password', 'secret' => true],
+            ],
+            'wechat_miniapp' => [
+                ['field' => 'app_id', 'label' => '小程序 AppID', 'type' => 'text', 'secret' => false],
+                ['field' => 'secret', 'label' => '小程序 AppSecret', 'type' => 'password', 'secret' => true],
+                ['field' => 'token', 'label' => '消息 Token', 'type' => 'password', 'secret' => true],
+                ['field' => 'aes_key', 'label' => 'EncodingAESKey', 'type' => 'password', 'secret' => true],
+            ],
+            'sms' => [
+                ['field' => 'default.gateways', 'label' => '默认短信渠道', 'type' => 'checkbox', 'options' => ['aliyun', 'qcloud'], 'secret' => false],
+                ['field' => 'gateways.aliyun.access_key_id', 'label' => '阿里云 AccessKey ID', 'type' => 'text', 'secret' => false],
+                ['field' => 'gateways.aliyun.access_key_secret', 'label' => '阿里云 AccessKey Secret', 'type' => 'password', 'secret' => true],
+                ['field' => 'gateways.aliyun.sign_name', 'label' => '阿里云短信签名', 'type' => 'text', 'secret' => false],
+                ['field' => 'gateways.qcloud.sdk_app_id', 'label' => '腾讯云 SdkAppId', 'type' => 'text', 'secret' => false],
+                ['field' => 'gateways.qcloud.secret_id', 'label' => '腾讯云 SecretId', 'type' => 'text', 'secret' => false],
+                ['field' => 'gateways.qcloud.secret_key', 'label' => '腾讯云 SecretKey', 'type' => 'password', 'secret' => true],
+                ['field' => 'gateways.qcloud.sign_name', 'label' => '腾讯云短信签名', 'type' => 'text', 'secret' => false],
+            ],
+            'storage' => [
+                ['field' => 'default', 'label' => '默认存储磁盘', 'type' => 'select', 'options' => ['local', 'aliyun', 'cos', 'qiniu'], 'secret' => false],
+                ['field' => 'upload.max_size_mb', 'label' => '上传大小上限(MB)', 'type' => 'number', 'secret' => false],
+                ['field' => 'upload.allowed_exts', 'label' => '允许的扩展名(逗号分隔)', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.local.root', 'label' => '本地存储目录', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.local.url_prefix', 'label' => '本地访问 URL 前缀', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.aliyun.access_key_id', 'label' => '阿里云 AccessKey ID', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.aliyun.access_key_secret', 'label' => '阿里云 AccessKey Secret', 'type' => 'password', 'secret' => true],
+                ['field' => 'disks.aliyun.bucket', 'label' => '阿里云 Bucket', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.aliyun.endpoint', 'label' => '阿里云 Endpoint(如 oss-cn-hangzhou.aliyuncs.com)', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.aliyun.domain', 'label' => '阿里云访问域名(留空用 bucket.endpoint)', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.aliyun.private', 'label' => '阿里云私有桶', 'type' => 'switch', 'secret' => false],
+                ['field' => 'disks.cos.secret_id', 'label' => '腾讯云 SecretId', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.cos.secret_key', 'label' => '腾讯云 SecretKey', 'type' => 'password', 'secret' => true],
+                ['field' => 'disks.cos.region', 'label' => '腾讯云 Region(如 ap-guangzhou)', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.cos.bucket', 'label' => '腾讯云 Bucket(含 APPID 后缀)', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.cos.domain', 'label' => '腾讯云访问域名(留空用默认)', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.cos.private', 'label' => '腾讯云私有桶', 'type' => 'switch', 'secret' => false],
+                ['field' => 'disks.qiniu.access_key', 'label' => '七牛 AccessKey', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.qiniu.secret_key', 'label' => '七牛 SecretKey', 'type' => 'password', 'secret' => true],
+                ['field' => 'disks.qiniu.bucket', 'label' => '七牛 Bucket', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.qiniu.domain', 'label' => '七牛访问域名', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.qiniu.upload_host', 'label' => '七牛上传域名(默认 https://upload.qiniup.com)', 'type' => 'text', 'secret' => false],
+                ['field' => 'disks.qiniu.private', 'label' => '七牛私有桶', 'type' => 'switch', 'secret' => false],
+            ],
+        ],
+        'config' => [
+            'pay' => ['default_provider' => 'wechat'],
+            'wechat' => [],
+            'wechat_miniapp' => [],
+            'sms' => ['default' => ['gateways' => ['aliyun']]],
+            'storage' => [
+                'default' => 'local',
+                'upload' => [
+                    'max_size_mb' => 20,
+                    'allowed_exts' => 'jpg,jpeg,png,gif,webp,svg,mp4,mp3,pdf,doc,docx,xls,xlsx,ppt,pptx,zip,txt,csv',
+                ],
+                'disks' => [
+                    'local' => ['root' => 'public/storage', 'url_prefix' => '/storage'],
+                ],
+            ],
+        ],
+    ],
+];
