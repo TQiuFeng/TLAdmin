@@ -156,34 +156,34 @@ C 端会员后台管理，与后台管理员账号体系分离。
 | 部分 | 技术 | 说明 |
 |---|---|---|
 | 服务端 | PHP 8.2+ | 运行环境；行政区划需 pdo_sqlite 扩展，二维码需 gd 扩展 |
-| 服务端 | ThinkPHP 8 | 框架底座；控制器方法上的注解同时生成路由、权限和 OpenAPI 文档 |
-| 服务端 | think-orm | 数据库访问；迁移和种子统一放在 database/migrations、database/seeders |
+|  | ThinkPHP 8 | 框架底座；控制器方法上的注解同时生成路由、权限和 OpenAPI 文档 |
+|  | think-orm | 数据库访问；迁移和种子统一放在 database/migrations、database/seeders |
 | 数据 | MySQL 8 | 业务数据：管理员、角色、菜单、配置、会员等 |
-| 数据 | Redis | access / refresh token、登录失败计数、接口限流计数、队列 |
-| 数据 | MongoDB | 操作日志、登录日志、第三方请求日志，按 request_id 检索 |
+|  | Redis | access / refresh token、登录失败计数、接口限流计数、队列 |
+|  | MongoDB | 操作日志、登录日志、第三方请求日志，按 request_id 检索 |
 | 后台前端 | Vue 3 + TypeScript | 按后端菜单树生成动态路由，v-permission 控制按钮权限 |
-| 后台前端 | Vite | 开发代理到后端，构建产物可直接部署到 server/public/admin |
-| 后台前端 | TDesign Vue Next | 组件库；通用组件 TablePlus、FormDialog、UploadPlus 基于它封装 |
-| 后台前端 | Pinia | 登录态、用户信息、菜单树、权限集合 |
-| 后台前端 | Vue Router | 动态路由和登录守卫 |
-| 后台前端 | Axios | 统一请求层：自动带 token，401 自动刷新 token 后重放，统一错误提示 |
+|  | Vite | 开发代理到后端，构建产物可直接部署到 server/public/admin |
+|  | TDesign Vue Next | 组件库；通用组件 TablePlus、FormDialog、UploadPlus 基于它封装 |
+|  | Pinia | 登录态、用户信息、菜单树、权限集合 |
+|  | Vue Router | 动态路由和登录守卫 |
+|  | Axios | 统一请求层：自动带 token，401 自动刷新 token 后重放，统一错误提示 |
 | 认证 | access + refresh token | token 存 Redis，登录失败自动锁定 |
-| 认证 | pragmarx/google2fa | Google Authenticator 动态验证码，可全局开启 |
+|  | pragmarx/google2fa | Google Authenticator 动态验证码，可全局开启 |
 | 第三方 | yansongda/pay | 微信支付、支付宝；密钥加密存库，接口返回脱敏 |
-| 第三方 | EasyWeChat | 公众号配置，小程序登录与手机号一键授权 |
-| 第三方 | EasySms | 短信：阿里云、腾讯云，后台选哪家就用哪家 |
-| 第三方 | 阿里云 OSS SDK | 前端直传阿里云 OSS |
-| 第三方 | 腾讯云 COS SDK | 前端直传腾讯云 COS |
-| 第三方 | 七牛 SDK | 前端直传七牛云；都不配时落到本地磁盘 |
+|  | EasyWeChat | 公众号配置，小程序登录与手机号一键授权 |
+|  | EasySms | 短信：阿里云、腾讯云，后台选哪家就用哪家 |
+|  | 阿里云 OSS SDK | 前端直传阿里云 OSS |
+|  | 腾讯云 COS SDK | 前端直传腾讯云 COS |
+|  | 七牛 SDK | 前端直传七牛云；都不配时落到本地磁盘 |
 | 工具库 | overtrue/pinyin | 拼音、首字母、URL 别名 |
-| 工具库 | overtrue/php-opencc | 简繁转换 |
-| 工具库 | 6tail/lunar-php | 万年历：农历、节气、节日、法定节假日与调休 |
-| 工具库 | bacon/bacon-qr-code | 二维码 |
-| 工具库 | Carbon | 日期处理 |
-| 工具库 | Guzzle | 统一 HTTP 客户端 |
-| 工具库 | 本地数据文件 | 手机号 / IP 归属地、五级行政区划、敏感词库，不调用外部接口 |
+|  | overtrue/php-opencc | 简繁转换 |
+|  | 6tail/lunar-php | 万年历：农历、节气、节日、法定节假日与调休 |
+|  | bacon/bacon-qr-code | 二维码 |
+|  | Carbon | 日期处理 |
+|  | Guzzle | 统一 HTTP 客户端 |
+|  | 本地数据文件 | 手机号 / IP 归属地、五级行政区划、敏感词库，不调用外部接口 |
 | 接口文档 | zircote/swagger-php | 从注解和响应 VO 生成 OpenAPI |
-| 接口文档 | Swagger UI | 内置调试台，可设访问密码 |
+|  | Swagger UI | 内置调试台，可设访问密码 |
 
 ## 项目结构
 
