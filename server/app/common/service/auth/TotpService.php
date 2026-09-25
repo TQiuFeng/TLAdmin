@@ -4,9 +4,8 @@ namespace app\common\service\auth;
 
 use app\common\cache\RedisClient;
 use app\common\config\ConfigRepository;
-use app\common\config\EnvLoader;
 use app\common\exception\BizException;
-use app\common\support\Tools;
+use app\common\support\AppKey;
 use PragmaRX\Google2FA\Google2FA;
 use think\facade\Db;
 
@@ -81,7 +80,7 @@ final class TotpService
         }
 
         Db::table('tl_admin_user')->where('id', $userId)->update([
-            'totp_secret' => self::ENCRYPT_PREFIX . Tools::encrypt($secret, $this->secretKey()),
+            'totp_secret' => self::ENCRYPT_PREFIX . AppKey::encrypt($secret),
             'totp_enabled' => 1,
             'update_time' => time(),
         ]);
@@ -121,7 +120,7 @@ final class TotpService
         }
 
         if (str_starts_with($stored, self::ENCRYPT_PREFIX)) {
-            $stored = Tools::decrypt(substr($stored, strlen(self::ENCRYPT_PREFIX)), $this->secretKey());
+            $stored = AppKey::decrypt(substr($stored, strlen(self::ENCRYPT_PREFIX)));
         }
 
         return $this->verifyCode($stored, $code);
@@ -145,11 +144,6 @@ final class TotpService
             'totp_enabled' => 0,
             'update_time' => time(),
         ]);
-    }
-
-    private function secretKey(): string
-    {
-        return (string) ($this->config->get('app.key') ?: EnvLoader::get('APP_KEY') ?: 'tladmin-local-dev-key');
     }
 
     private function mustFindUser(int $userId): array

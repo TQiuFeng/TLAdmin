@@ -3,6 +3,7 @@
 namespace app\common\service\integration;
 
 use app\common\config\ConfigRepository;
+use app\common\support\AppKey;
 use app\common\support\Tools;
 
 /**
@@ -113,7 +114,7 @@ final class IntegrationConfigService
             $name = (string) ($field['field'] ?? '');
             $value = Tools::arrGet($config, $name);
             if (is_string($value) && str_starts_with($value, self::ENCRYPT_PREFIX)) {
-                $this->setNested($config, $name, Tools::decrypt(substr($value, strlen(self::ENCRYPT_PREFIX)), $this->secretKey()));
+                $this->setNested($config, $name, AppKey::decrypt(substr($value, strlen(self::ENCRYPT_PREFIX))));
             }
         }
 
@@ -148,15 +149,7 @@ final class IntegrationConfigService
 
     private function encryptSecret(string $value): string
     {
-        return self::ENCRYPT_PREFIX . Tools::encrypt($value, $this->secretKey());
-    }
-
-    /**
-     * 开发环境允许使用兜底 key，生产环境必须配置 APP_KEY。
-     */
-    private function secretKey(): string
-    {
-        return (string) ($this->config->get('app.key') ?: getenv('APP_KEY') ?: 'tladmin-local-dev-key');
+        return self::ENCRYPT_PREFIX . AppKey::encrypt($value);
     }
 
     private function setNested(array &$array, string $key, mixed $value): void

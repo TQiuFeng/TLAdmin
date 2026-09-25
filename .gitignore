@@ -6,3 +6,17 @@ docs/tladmin-thinkphp8-admin-design.md
 
 # macOS 系统文件
 .DS_Store
+
+# 本地环境与密钥:.env 含 APP_KEY、数据库密码,只提交 .env.example
+.env
+server/.env
+
+# 依赖与构建产物
+web/node_modules/
+web/dist/
+web/*.tsbuildinfo
+web/vite.local.config.ts
+
+# 运行时:路由缓存、后台保存的配置(含加密后的第三方密钥)、用户上传文件
+server/runtime/
+server/public/storage/uploads/

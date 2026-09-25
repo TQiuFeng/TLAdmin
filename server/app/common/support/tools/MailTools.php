@@ -104,9 +104,7 @@ trait MailTools
             }
         }
 
-        $value = getenv($key);
-
-        return $value === false ? '' : (string) $value;
+        return (string) \app\common\config\EnvLoader::get($key, '');
     }
 
     private static function mailAddressList(string|array $input): array

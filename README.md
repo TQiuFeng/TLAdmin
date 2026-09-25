@@ -274,6 +274,8 @@ php bin/console schedule:run     # 执行到期定时任务(配合系统 crontab
 php bin/console queue:work       # 队列消费(--once 只消费一条)
 php bin/console queue:size       # 查看队列积压
 php bin/console gen:crud 表名 --title=名称   # 生成 CRUD 全套代码
+php bin/console key:generate     # 生成 APP_KEY 写入 .env(已有值时需 --force)
+php bin/console secrets:reencrypt   # 用当前 APP_KEY 重新加密存量密钥(升级或换密钥后执行,换密钥加 --from=旧密钥)
 php tests/run.php                # 运行测试(需要数据库的用例在库不可用时跳过;有失败时退出码为 1)
 php tests/run.php Generator      # 只运行文件名包含 Generator 的测试
 
@@ -305,7 +307,8 @@ composer install --no-dev --optimize-autoloader
 
 # 配置环境
 cp .env.example .env
-# 修改 .env:数据库、Redis、MongoDB、APP_KEY(生产必须改成随机串)
+# 修改 .env:数据库、Redis、MongoDB,APP_ENV 改为 production
+php bin/console key:generate  # 生成随机 APP_KEY 写入 .env;生产环境没有 APP_KEY 会直接报错
 
 # 初始化数据库
 php bin/console migrate
@@ -388,7 +391,9 @@ WantedBy=multi-user.target
 
 ## 6. 上线检查清单
 
-- [ ] `.env` 的 `APP_KEY` 已换成随机串(影响云存储密钥加密)
+- [ ] 已执行 `php bin/console key:generate`,`.env` 的 `APP_KEY` 是随机串(用于加密第三方密钥和动态验证码)
+- [ ] 从旧版本升级:执行 `php bin/console secrets:reencrypt`,把旧版用默认密钥加密的第三方密钥换成当前 APP_KEY
+- [ ] `.env` 不要提交到仓库(已在 .gitignore)
 - [ ] admin 默认密码已修改;按需开启动态验证码全局开关
 - [ ] MySQL / Redis / MongoDB 不对公网暴露
 - [ ] 附件存储:云存储直传需在「附件管理 → 第三方配置」填入密钥(自动加密存储)
@@ -475,7 +480,7 @@ OpenAPI JSON：http://127.0.0.1:8000/adminapi/openapi.json
 | `APP_NAME` | 应用名称 |
 | `APP_ENV` | 环境名，开发环境一般为 `local` |
 | `APP_DEBUG` | 是否开启 debug |
-| `APP_KEY` | 加密密钥，生产环境必须设置 |
+| `APP_KEY` | 加密第三方密钥、动态验证码的密钥;用 `php bin/console key:generate` 生成,生产环境不设置会直接报错 |
 | `API_RESPONSE_FORMAT` | 默认 API 响应格式，`json` 或 `xml` |
 | `DB_*` | MySQL 连接 |
 | `REDIS_*` | Redis 连接，token、队列、限流依赖它 |

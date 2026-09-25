@@ -10,6 +10,8 @@
  *   php bin/console seed             执行种子数据
  *   php bin/console route:list       输出注解路由表
  *   php bin/console route:cache      重建路由缓存
+ *   php bin/console key:generate     生成 APP_KEY 写入 .env(已有值时需 --force)
+ *   php bin/console secrets:reencrypt [--from=旧APP_KEY]  用当前 APP_KEY 重新加密存量密钥
  * Author: qiufeng
  */
 
@@ -142,6 +144,44 @@ try {
             echo "下一步: php bin/console seed 写入菜单,重新登录即可看到新菜单\n";
             break;
 
+        case 'key:generate':
+            $envFile = $rootPath . '/.env';
+            if (!is_file($envFile)) {
+                echo "未找到 .env,请先复制 .env.example。新密钥:\n" . \app\common\support\AppKey::generate() . "\n";
+                break;
+            }
+            if (!\app\common\support\AppKey::writeToEnvFile($envFile, in_array('--force', $argv, true))) {
+                echo "APP_KEY 已有值,未覆盖。更换密钥会让已加密的数据解不开;确需更换请加 --force,\n"
+                    . "之后执行 php bin/console secrets:reencrypt --from=旧密钥 把存量密文换成新密钥。\n";
+                exit(1);
+            }
+            echo "已写入 .env 的 APP_KEY。如果之前存过第三方密钥或绑定过动态验证码,请执行 php bin/console secrets:reencrypt\n";
+            break;
+
+        case 'secrets:reencrypt':
+            $previous = [];
+            foreach ($argv as $arg) {
+                if (str_starts_with($arg, '--from=')) {
+                    $previous[] = substr($arg, 7);
+                }
+            }
+            $config = new \app\common\config\ConfigRepository(
+                [
+                    $rootPath . '/config/app.php',
+                    $rootPath . '/config/api.php',
+                    $rootPath . '/config/integration.php',
+                    $rootPath . '/config/security.php',
+                ],
+                $rootPath . '/runtime/config/system.json'
+            );
+            $result = (new \app\common\service\security\SecretReencryptService($config))->run($previous);
+            echo "重新加密:第三方配置 {$result['config']} 项,动态验证码 {$result['totp']} 个\n";
+            if ($result['failed'] !== []) {
+                echo "解不开(需要用 --from 提供加密时的旧 APP_KEY):\n  " . implode("\n  ", $result['failed']) . "\n";
+                exit(1);
+            }
+            break;
+
         default:
             echo "可用命令:\n"
                 . "  migrate          执行未应用的迁移\n"
@@ -153,7 +193,9 @@ try {
                 . "  schedule:run     执行到期定时任务(配合系统 crontab 每分钟调用)\n"
                 . "  queue:work       队列消费(--once 只消费一条)\n"
                 . "  queue:size       查看队列长度\n"
-                . "  queue:push-demo  入队一个示例任务(调试用)\n";
+                . "  queue:push-demo  入队一个示例任务(调试用)\n"
+                . "  key:generate     生成 APP_KEY 写入 .env(已有值时需 --force)\n"
+                . "  secrets:reencrypt [--from=旧APP_KEY]  用当前 APP_KEY 重新加密存量密钥\n";
     }
 } catch (Throwable $e) {
     fwrite(STDERR, "执行失败: {$e->getMessage()}\n{$e->getTraceAsString()}\n");

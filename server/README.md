@@ -45,7 +45,8 @@ MONGO_HOST=127.0.0.1
 ```bash
 composer install
 cp .env.example .env
-# 修改 .env 中 DB_*、REDIS_*、MONGO_*、APP_KEY
+# 修改 .env 中 DB_*、REDIS_*、MONGO_*,然后生成 APP_KEY:
+# php bin/console key:generate
 php bin/console migrate
 php bin/console seed
 # 注意 PHP_CLI_SERVER_WORKERS=4:php -S 默认单进程,一次只处理一个请求,

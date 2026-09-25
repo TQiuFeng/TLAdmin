@@ -21,7 +21,8 @@ composer install --no-dev --optimize-autoloader
 
 # 配置环境
 cp .env.example .env
-# 修改 .env:数据库、Redis、MongoDB、APP_KEY(生产必须改成随机串)
+# 修改 .env:数据库、Redis、MongoDB,APP_ENV 改为 production
+php bin/console key:generate  # 生成随机 APP_KEY 写入 .env;生产环境没有 APP_KEY 会直接报错
 
 # 初始化数据库
 php bin/console migrate
@@ -104,7 +105,9 @@ WantedBy=multi-user.target
 
 ## 6. 上线检查清单
 
-- [ ] `.env` 的 `APP_KEY` 已换成随机串(影响云存储密钥加密)
+- [ ] 已执行 `php bin/console key:generate`,`.env` 的 `APP_KEY` 是随机串(用于加密第三方密钥和动态验证码)
+- [ ] 从旧版本升级:执行 `php bin/console secrets:reencrypt`,把旧版用默认密钥加密的第三方密钥换成当前 APP_KEY
+- [ ] `.env` 不要提交到仓库(已在 .gitignore)
 - [ ] admin 默认密码已修改;按需开启动态验证码全局开关
 - [ ] MySQL / Redis / MongoDB 不对公网暴露
 - [ ] 附件存储:云存储直传需在「附件管理 → 第三方配置」填入密钥(自动加密存储)
