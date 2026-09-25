@@ -79,19 +79,77 @@ TLAdmin 后端和前端都提供了统一工具库，业务代码可以直接复
 
 ## 界面预览
 
-| 登录 | 仪表盘 |
-|------|------|
-| ![登录](docs/screenshots/login.png) | ![仪表盘](docs/screenshots/dashboard.png) |
-| 演示中心 · 工具箱(万年历、拼音、敏感词、归属地、行政区划…) | 演示中心 · 代码生成器生成的页面 |
-| ![工具箱](docs/screenshots/toolbox.png) | ![演示文章](docs/screenshots/demo-article.png) |
-| 管理员管理 | 新增管理员 |
-| ![管理员管理](docs/screenshots/user.png) | ![新增管理员](docs/screenshots/user-dialog.png) |
-| 角色管理(数据权限) | 菜单管理(目录/菜单/按钮/接口) |
-| ![角色管理](docs/screenshots/role.png) | ![菜单管理](docs/screenshots/menu.png) |
-| 插件配置(支付/公众号/小程序/短信/存储) | 代码生成器 |
-| ![插件配置](docs/screenshots/integration.png) | ![代码生成器](docs/screenshots/generator.png) |
-| 操作日志(MongoDB) | 会员管理 |
-| ![操作日志](docs/screenshots/operation-log.png) | ![会员列表](docs/screenshots/member.png) |
+### 登录
+
+账号密码登录，账号开启动态验证码后自动要求输入 6 位验证码。
+
+![登录](docs/screenshots/login.png)
+
+### 仪表盘
+
+当前账号的角色、权限点、可见菜单和常用功能入口。
+
+![仪表盘](docs/screenshots/dashboard.png)
+
+### 演示中心 · 工具箱
+
+内置 Tools 工具库在线试用：万年历、拼音、敏感词、手机号/IP 归属地、五级行政区划、金额大写、二维码。
+
+![演示中心 · 工具箱](docs/screenshots/toolbox.png)
+
+### 演示中心 · 生成的页面
+
+由代码生成器生成、未手改的 CRUD 页面，含模糊/精确搜索、开关、日期时间字段。
+
+![演示中心 · 生成的页面](docs/screenshots/demo-article.png)
+
+### 管理员管理
+
+分配角色、部门、岗位，支持重置密码和重置动态验证码。
+
+![管理员管理](docs/screenshots/user.png)
+
+### 新增管理员
+
+统一的弹窗表单组件 FormDialog。
+
+![新增管理员](docs/screenshots/user-dialog.png)
+
+### 角色管理
+
+角色绑定菜单权限，并配置数据权限范围（全部 / 本部门及以下 / 本部门 / 仅本人）。
+
+![角色管理](docs/screenshots/role.png)
+
+### 菜单管理
+
+目录、菜单、按钮、接口四类节点，前端路由和后端接口权限共用一套标识。
+
+![菜单管理](docs/screenshots/menu.png)
+
+### 插件配置
+
+支付、公众号、小程序、短信、存储统一配置；短信和存储选哪家服务商就只显示哪家的密钥项，密钥加密存储。
+
+![插件配置](docs/screenshots/integration.png)
+
+### 代码生成器
+
+选择数据表，逐字段配置列表、搜索、表单控件，预览后生成后端、前端和菜单。
+
+![代码生成器](docs/screenshots/generator.png)
+
+### 操作日志
+
+每次请求带 request_id，日志写入 MongoDB，敏感字段自动脱敏。
+
+![操作日志](docs/screenshots/operation-log.png)
+
+### 会员管理
+
+C 端会员后台管理，与后台管理员账号体系分离。
+
+![会员管理](docs/screenshots/member.png)
 
 ## 技术栈
 
