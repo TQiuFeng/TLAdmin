@@ -155,7 +155,7 @@ C 端会员后台管理，与后台管理员账号体系分离。
 
 <table>
   <thead>
-    <tr><th>部分</th><th>技术</th><th>说明</th></tr>
+    <tr><th width="90">部分</th><th width="190">技术</th><th>说明</th></tr>
   </thead>
   <tbody>
     <tr><td rowspan="3">服务端</td><td>PHP 8.2+</td><td>运行环境；行政区划需 pdo_sqlite 扩展，二维码需 gd 扩展</td></tr>
