@@ -104,7 +104,7 @@
                 clearable
                 placeholder="选择归属地(国家/省/市)"
                 style="width: 280px"
-                @change="(val: string[]) => applyRegion(rule, val)"
+                @change="(val: unknown) => applyRegion(rule, val as string[])"
               />
               <t-input v-model="rule.ip" placeholder="IP / 网段(可选,精确匹配)" style="width: 220px" />
               <t-button variant="text" theme="danger" @click="ipBlock.rules.splice(i, 1)">删除</t-button>

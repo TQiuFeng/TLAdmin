@@ -1,10 +1,10 @@
 /**
- * 应用入口:Pinia → Router → TDesign → 权限指令。
+ * 应用入口:Pinia → Router → 权限指令。
+ * TDesign 组件由 vite.config.ts 里的 unplugin-vue-components 按需引入,这里只引全量样式(主题变量依赖它)。
  * Author: qiufeng
  */
 import { createApp } from 'vue';
 import { createPinia } from 'pinia';
-import TDesign from 'tdesign-vue-next';
 import App from '@/App.vue';
 import router from '@/router';
 import { permission } from '@/directives/permission';
@@ -15,6 +15,5 @@ import '@/styles/global.css';
 const app = createApp(App);
 app.use(createPinia());
 app.use(router);
-app.use(TDesign);
 app.directive('permission', permission);
 app.mount('#app');

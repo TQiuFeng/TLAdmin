@@ -157,7 +157,7 @@ const formRef = ref<FormInstanceFunctions>();
 
 const emptyForm = (): AdminUserForm => ({
   username: '', password: '', nickname: '', email: '', mobile: '',
-  dept_id: null, status: 1, remark: '', role_ids: [], post_ids: [],
+  dept_id: undefined, status: 1, remark: '', role_ids: [], post_ids: [],
 });
 const form = reactive<AdminUserForm>(emptyForm());
 
@@ -185,7 +185,7 @@ async function openEdit(row: AdminUserItem): Promise<void> {
     nickname: detail.nickname,
     email: detail.email,
     mobile: detail.mobile,
-    dept_id: detail.dept_id || null,
+    dept_id: detail.dept_id || undefined,
     status: detail.status,
     remark: detail.remark,
     role_ids: detail.role_ids,

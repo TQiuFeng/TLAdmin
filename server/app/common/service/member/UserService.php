@@ -72,6 +72,8 @@ final class UserService
         if (trim((string) ($data['username'] ?? '')) === '' && trim((string) ($data['mobile'] ?? '')) === '') {
             throw BizException::paramError('账号和手机号至少填写一个');
         }
+        $this->assertUnique('username', trim((string) ($data['username'] ?? '')));
+        $this->assertUnique('mobile', trim((string) ($data['mobile'] ?? '')));
 
         $now = time();
 
@@ -99,7 +101,14 @@ final class UserService
         $updates = [];
         foreach (['username', 'nickname', 'avatar', 'mobile', 'email', 'remark'] as $field) {
             if (array_key_exists($field, $data)) {
-                $updates[$field] = (string) $data[$field];
+                $updates[$field] = in_array($field, ['username', 'mobile'], true)
+                    ? trim((string) $data[$field])
+                    : (string) $data[$field];
+            }
+        }
+        foreach (['username', 'mobile'] as $field) {
+            if (isset($updates[$field])) {
+                $this->assertUnique($field, $updates[$field], $id);
             }
         }
         foreach (['gender', 'status', 'balance', 'points'] as $field) {
@@ -111,6 +120,27 @@ final class UserService
         if ($updates !== []) {
             $updates['update_time'] = time();
             Db::table(self::TABLE)->where('id', $id)->update($updates);
+        }
+    }
+
+    /**
+     * 账号、手机号在未删除的会员里唯一;空值不检查(两者允许只填一个)。
+     *
+     * @param int $exceptId 编辑时排除自身
+     */
+    private function assertUnique(string $field, string $value, int $exceptId = 0): void
+    {
+        if ($value === '') {
+            return;
+        }
+
+        $exists = Db::table(self::TABLE)
+            ->where($field, $value)
+            ->whereNull('delete_time')
+            ->where('id', '<>', $exceptId)
+            ->find();
+        if ($exists) {
+            throw BizException::conflict($field === 'mobile' ? '手机号已被其他会员使用' : '账号已被其他会员使用');
         }
     }
 

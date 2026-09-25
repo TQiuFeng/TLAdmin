@@ -45,7 +45,8 @@ export interface AdminUserForm {
   nickname: string;
   email: string;
   mobile: string;
-  dept_id: number | null;
+  /** 未选部门时为空,提交时转成 0 */
+  dept_id?: number;
   status: number;
   remark: string;
   role_ids: number[];

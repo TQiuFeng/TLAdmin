@@ -169,8 +169,12 @@ const loading = ref(false);
 const saving = ref('');
 const activeGroup = ref('pay');
 const groups = ref<IntegrationGroup[]>([]);
-/** 每个能力组的扁平表单值:{ group: { field: value } } */
-const forms = reactive<Record<string, Record<string, unknown>>>({});
+/**
+ * 每个能力组的扁平表单值:{ group: { field: value } }。
+ * schema 驱动,值的类型随控件变化(文本/数字/开关/多选),这里不做静态约束。
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const forms = reactive<Record<string, Record<string, any>>>({});
 
 function optionLabel(g: IntegrationGroup, value: string): string {
   return OPTION_LABELS[g.group]?.[value] ?? value;

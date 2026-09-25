@@ -71,13 +71,18 @@ a {
   text-decoration: none;
 }
 
+/*
+ * 以下组件覆盖统一加 body 前缀:TDesign 按需引入后,组件样式随页面分包在 global.css 之后加载,
+ * 同等优先级会被它覆盖回去。
+ */
+
 /* ---------- 卡片 ---------- */
-.t-card {
+body .t-card {
   border-radius: 8px;
   box-shadow: var(--tl-shadow);
 }
 
-.t-card__title {
+body .t-card__title {
   font-size: 16px;
   font-weight: 600;
 }
@@ -111,48 +116,48 @@ a {
 }
 
 /* ---------- 表格 ---------- */
-.t-table {
+body .t-table {
   font-size: 13px;
 }
 
-.t-table th {
+body .t-table th {
   height: 44px;
   font-weight: 600;
   color: #4b5563;
   background: #f7f9fa;
 }
 
-.t-table--hoverable tbody tr:hover {
+body .t-table--hoverable tbody tr:hover {
   background-color: #f3f8f6;
 }
 
 /* ---------- 表单 ---------- */
 /* TDesign 带 help 的表单项底部间距只有 4px,提示文字会贴住下一行,这里补足间距 */
-.t-form__item.t-form__item-with-help {
+body .t-form__item.t-form__item-with-help {
   margin-bottom: 18px;
 }
 
-.t-form__item .t-input__help {
+body .t-form__item .t-input__help {
   margin-top: 4px;
   line-height: 18px;
 }
 
 /* ---------- 弹窗 / 抽屉 ---------- */
-.t-dialog {
+body .t-dialog {
   border-radius: 10px;
 }
 
-.t-dialog__header {
+body .t-dialog__header {
   font-size: 16px;
 }
 
-.t-drawer__header {
+body .t-drawer__header {
   font-size: 16px;
   font-weight: 600;
 }
 
 /* ---------- 标签 ---------- */
-.t-tag {
+body .t-tag {
   border-radius: 4px;
 }
 

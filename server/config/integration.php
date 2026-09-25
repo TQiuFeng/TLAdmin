@@ -25,7 +25,7 @@ return [
             ],
             'filesystem' => [
                 'name' => 'topthink/think-filesystem',
-                'class' => \think\filesystem\Filesystem::class,
+                'class' => \think\Filesystem::class,
                 'title' => '文件系统',
             ],
             'aliyun_oss' => [

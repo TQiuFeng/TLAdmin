@@ -86,7 +86,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { DialogPlugin, type DropdownProps } from 'tdesign-vue-next';
+import { DialogPlugin, type DropdownOption, type DropdownProps } from 'tdesign-vue-next';
 import {
   MenuFoldIcon,
   MenuUnfoldIcon,
@@ -212,7 +212,7 @@ const userMenuOptions: DropdownProps['options'] = [
   { content: '退出登录', value: 'logout', divider: true },
 ];
 
-async function onUserMenuClick(data: { value: unknown }): Promise<void> {
+async function onUserMenuClick(data: DropdownOption): Promise<void> {
   if (data.value === 'profile') {
     router.push('/profile');
     return;
