@@ -209,6 +209,16 @@ final class CrudGenerator
         return $resolved;
     }
 
+    /**
+     * 开关字段的两种取值文案:status 为启用/禁用,其他(如 is_top)为是/否。
+     *
+     * @return array{0: string, 1: string}
+     */
+    private function switchLabels(array $col): array
+    {
+        return $col['name'] === 'status' ? ['启用', '禁用'] : ['是', '否'];
+    }
+
     private function isInt(array $col): bool
     {
         return in_array($col['base'], ['int', 'bigint', 'smallint', 'mediumint', 'tinyint'], true);
@@ -664,11 +674,14 @@ TS;
         foreach ($this->listColumns() as $col) {
             $name = $col['name'];
             if ($col['component'] === 'switch') {
+                [$on, $off] = $this->switchLabels($col);
+                // 状态字段关闭时标红,其他开关(如置顶)关闭只是普通状态,用灰色
+                $offTheme = $name === 'status' ? 'danger' : 'default';
                 $columnSlots .= <<<HTML
 
     <template #{$name}="{ row }">
-      <t-tag :theme="row.{$name} === 1 ? 'success' : 'danger'" variant="light">
-        {{ row.{$name} === 1 ? '启用' : '禁用' }}
+      <t-tag :theme="row.{$name} === 1 ? 'success' : '{$offTheme}'" variant="light">
+        {{ row.{$name} === 1 ? '{$on}' : '{$off}' }}
       </t-tag>
     </template>
 HTML;
@@ -683,10 +696,11 @@ HTML;
         foreach ($this->searchColumns() as $col) {
             $name = $col['name'];
             if ($col['component'] === 'switch') {
+                [$on, $off] = $this->switchLabels($col);
                 $searchInputs .= <<<HTML
       <t-select v-model="query.{$name}" placeholder="{$col['label']}" clearable>
-        <t-option label="启用" :value="1" />
-        <t-option label="禁用" :value="0" />
+        <t-option label="{$on}" :value="1" />
+        <t-option label="{$off}" :value="0" />
       </t-select>
 
 HTML;
@@ -703,13 +717,28 @@ HTML;
         foreach ($this->formColumns() as $col) {
             $name = $col['name'];
             $label = $col['label'];
+            [$on, $off] = $this->switchLabels($col);
             $formItems .= match ($col['component']) {
                 'switch' => <<<HTML
       <t-form-item label="{$label}" name="{$name}">
         <t-radio-group v-model="form.{$name}">
-          <t-radio :value="1">启用</t-radio>
-          <t-radio :value="0">禁用</t-radio>
+          <t-radio :value="1">{$on}</t-radio>
+          <t-radio :value="0">{$off}</t-radio>
         </t-radio-group>
+      </t-form-item>
+
+HTML,
+                // 时间字段库里存秒级时间戳,日期选择器用毫秒,这里做换算
+                'datetime' => <<<HTML
+      <t-form-item label="{$label}" name="{$name}">
+        <t-date-picker
+          :value="form.{$name} ? form.{$name} * 1000 : undefined"
+          enable-time-picker
+          value-type="time-stamp"
+          clearable
+          placeholder="请选择{$label}"
+          @change="(v: unknown) => (form.{$name} = v ? Math.floor(Number(v) / 1000) : 0)"
+        />
       </t-form-item>
 
 HTML,
@@ -740,7 +769,7 @@ HTML,
         foreach ($this->formColumns() as $col) {
             $name = $col['name'];
             $default = match (true) {
-                $col['component'] === 'switch' => '1',
+                $col['component'] === 'switch' => $name === 'status' ? '1' : '0',
                 $col['ts_type'] === 'number' => '0',
                 default => "''",
             };

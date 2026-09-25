@@ -1,4 +1,50 @@
-/* 全局样式 Author: qiufeng */
+/* 全局样式:TDesign 主题变量覆盖 + 布局/表格/弹窗统一微调 Author: qiufeng */
+
+/* ---------- 主题变量 ---------- */
+:root {
+  /* 品牌色:TDesign 以 7 号为主色,6 号 hover,8 号 active,1/2 号浅底 */
+  --td-brand-color-1: #e8f7f1;
+  --td-brand-color-2: #c6eddd;
+  --td-brand-color-3: #97dcc2;
+  --td-brand-color-4: #66c9a6;
+  --td-brand-color-5: #3db88e;
+  --td-brand-color-6: #26ad85;
+  --td-brand-color-7: #16a37a;
+  --td-brand-color-8: #0f8a66;
+  --td-brand-color-9: #0a6e51;
+  --td-brand-color-10: #06523c;
+
+  /* 中性色 */
+  --td-text-color-primary: #1f2937;
+  --td-text-color-secondary: #6b7280;
+  --td-text-color-placeholder: #9ca3af;
+  --td-bg-color-page: #f5f7f9;
+  --td-bg-color-container-hover: #f3f6f5;
+  --td-bg-color-secondarycontainer: #f7f9fa;
+  --td-component-stroke: #eef0f2;
+  --td-component-border: #dfe3e8;
+  --td-border-level-1-color: #eef0f2;
+  --td-border-level-2-color: #dfe3e8;
+
+  /* 圆角与阴影 */
+  --td-radius-default: 6px;
+  --td-radius-medium: 8px;
+  --td-radius-large: 10px;
+  --td-shadow-1: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 6px rgba(17, 24, 39, 0.05);
+
+  /* 业务侧可直接使用的变量 */
+  --tl-primary: #16a37a;
+  --tl-primary-dark: #0f8a66;
+  --tl-primary-light: #e6f6f0;
+  --tl-bg: #f5f7f9;
+  --tl-line: #eef0f2;
+  --tl-text-1: #1f2937;
+  --tl-text-2: #6b7280;
+  --tl-text-3: #9ca3af;
+  --tl-hover: #f3f6f5;
+  --tl-shadow: var(--td-shadow-1);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -12,8 +58,134 @@ body,
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Microsoft YaHei', 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   font-size: 14px;
+  line-height: 1.5;
   color: var(--td-text-color-primary);
   background: var(--td-bg-color-page);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--tl-primary);
+  text-decoration: none;
+}
+
+/* ---------- 卡片 ---------- */
+.t-card {
+  border-radius: 8px;
+  box-shadow: var(--tl-shadow);
+}
+
+.t-card__title {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* 页面内通用面板(与 t-card 同一观感,不想引入 t-card 时用) */
+.panel {
+  padding: 20px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: var(--tl-shadow);
+}
+
+.panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.panel__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--tl-text-1);
+}
+
+.panel__title small {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--tl-text-3);
+}
+
+/* ---------- 表格 ---------- */
+.t-table {
+  font-size: 13px;
+}
+
+.t-table th {
+  height: 44px;
+  font-weight: 600;
+  color: #4b5563;
+  background: #f7f9fa;
+}
+
+.t-table--hoverable tbody tr:hover {
+  background-color: #f3f8f6;
+}
+
+/* ---------- 表单 ---------- */
+/* TDesign 带 help 的表单项底部间距只有 4px,提示文字会贴住下一行,这里补足间距 */
+.t-form__item.t-form__item-with-help {
+  margin-bottom: 18px;
+}
+
+.t-form__item .t-input__help {
+  margin-top: 4px;
+  line-height: 18px;
+}
+
+/* ---------- 弹窗 / 抽屉 ---------- */
+.t-dialog {
+  border-radius: 10px;
+}
+
+.t-dialog__header {
+  font-size: 16px;
+}
+
+.t-drawer__header {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+/* ---------- 标签 ---------- */
+.t-tag {
+  border-radius: 4px;
+}
+
+/* ---------- 路由切换过渡 ---------- */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: opacity 0.18s ease, transform 0.18s ease;
+}
+
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+.fade-slide-leave-to {
+  opacity: 0;
+}
+
+/* ---------- 滚动条 ---------- */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d5dae0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #bfc6ce;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
 }

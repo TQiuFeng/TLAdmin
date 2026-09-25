@@ -1,70 +1,76 @@
 <!--
-  登录页:布局取自 TDesign 官方 starter(tdesign-vue-next-starter)登录页,
+  登录页:左侧品牌区 + 右侧登录卡片,
   接入 TLAdmin 登录逻辑(账号密码 + Google 动态验证码,后端返回 totp_required 时自动展开码输入框)。
   Author: qiufeng
 -->
 <template>
-  <div class="login-wrapper">
-    <header class="login-header">
-      <div class="logo">TLAdmin</div>
-    </header>
-
-    <div class="login-container">
-      <div class="title-container">
-        <h1 class="title margin-no">登录到</h1>
-        <h1 class="title">TLAdmin 管理后台</h1>
-        <div class="sub-title">
-          <p class="tip">中后台快速开发框架</p>
+  <div class="login">
+    <section class="login-brand">
+      <div class="login-brand__inner">
+        <div class="login-brand__logo">
+          <img :src="logoUrl" alt="" />
+          <span>TLAdmin</span>
         </div>
+        <h1>中后台管理框架</h1>
+        <p class="login-brand__slogan">登录、权限、配置、日志开箱即用,业务模块直接往上接</p>
+        <ul class="login-features">
+          <li v-for="f in features" :key="f.title">
+            <span class="login-features__icon"><component :is="f.icon" size="18px" /></span>
+            <div>
+              <strong>{{ f.title }}</strong>
+              <small>{{ f.desc }}</small>
+            </div>
+          </li>
+        </ul>
+      </div>
+      <span class="login-brand__circle login-brand__circle--a" />
+      <span class="login-brand__circle login-brand__circle--b" />
+    </section>
+
+    <section class="login-panel">
+      <div class="login-card">
+        <h2>欢迎登录</h2>
+        <p class="login-card__hint">请使用管理员账号登录 TLAdmin 管理后台</p>
+
+        <t-form ref="formRef" :data="form" :rules="rules" label-align="top" @submit="onSubmit">
+          <t-form-item label="账号" name="username">
+            <t-input v-model="form.username" size="large" placeholder="请输入账号" clearable>
+              <template #prefix-icon><user-icon /></template>
+            </t-input>
+          </t-form-item>
+
+          <t-form-item label="密码" name="password">
+            <t-input
+              v-model="form.password"
+              size="large"
+              :type="showPsw ? 'text' : 'password'"
+              clearable
+              placeholder="请输入登录密码"
+            >
+              <template #prefix-icon><lock-on-icon /></template>
+              <template #suffix-icon>
+                <browse-icon v-if="showPsw" class="psw-toggle" @click="showPsw = !showPsw" />
+                <browse-off-icon v-else class="psw-toggle" @click="showPsw = !showPsw" />
+              </template>
+            </t-input>
+          </t-form-item>
+
+          <t-form-item v-if="totpRequired" label="动态验证码" name="code">
+            <t-input v-model="form.code" size="large" clearable placeholder="请输入 6 位动态验证码" :maxlength="6" autofocus>
+              <template #prefix-icon><secured-icon /></template>
+            </t-input>
+          </t-form-item>
+
+          <div class="login-card__remember">
+            <t-checkbox v-model="remember">记住账号</t-checkbox>
+          </div>
+
+          <t-button block size="large" type="submit" class="login-card__submit" :loading="loading">登 录</t-button>
+        </t-form>
       </div>
 
-      <t-form
-        ref="formRef"
-        class="item-container"
-        :data="form"
-        :rules="rules"
-        label-width="0"
-        @submit="onSubmit"
-      >
-        <t-form-item name="username">
-          <t-input v-model="form.username" size="large" placeholder="请输入账号">
-            <template #prefix-icon><user-icon /></template>
-          </t-input>
-        </t-form-item>
-
-        <t-form-item name="password">
-          <t-input
-            v-model="form.password"
-            size="large"
-            :type="showPsw ? 'text' : 'password'"
-            clearable
-            placeholder="请输入登录密码"
-          >
-            <template #prefix-icon><lock-on-icon /></template>
-            <template #suffix-icon>
-              <browse-icon v-if="showPsw" class="psw-toggle" @click="showPsw = !showPsw" />
-              <browse-off-icon v-else class="psw-toggle" @click="showPsw = !showPsw" />
-            </template>
-          </t-input>
-        </t-form-item>
-
-        <t-form-item v-if="totpRequired" name="code">
-          <t-input v-model="form.code" size="large" clearable placeholder="请输入 6 位动态验证码" :maxlength="6" autofocus>
-            <template #prefix-icon><secured-icon /></template>
-          </t-input>
-        </t-form-item>
-
-        <div class="check-container remember-pwd">
-          <t-checkbox v-model="remember">记住账号</t-checkbox>
-        </div>
-
-        <t-form-item class="btn-container">
-          <t-button block size="large" type="submit" :loading="loading">登录</t-button>
-        </t-form-item>
-      </t-form>
-    </div>
-
-    <footer class="copyright">Copyright &copy; {{ new Date().getFullYear() }} TLAdmin. All Rights Reserved</footer>
+      <footer class="login-panel__copyright">Copyright &copy; {{ new Date().getFullYear() }} TLAdmin. All Rights Reserved</footer>
+    </section>
   </div>
 </template>
 
@@ -72,11 +78,29 @@
 import { onMounted, reactive, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { MessagePlugin, type FormProps, type FormInstanceFunctions } from 'tdesign-vue-next';
-import { UserIcon, LockOnIcon, SecuredIcon, BrowseIcon, BrowseOffIcon } from 'tdesign-icons-vue-next';
+import {
+  UserIcon,
+  LockOnIcon,
+  SecuredIcon,
+  BrowseIcon,
+  BrowseOffIcon,
+  UserSafetyIcon,
+  ApiIcon,
+  CloudUploadIcon,
+  CodeIcon,
+} from 'tdesign-icons-vue-next';
 import { useUserStore } from '@/stores/user';
 import type { ApiResult } from '@/types/api';
+import logoUrl from '@/assets/logo.svg';
 
 const REMEMBER_KEY = 'tladmin:remember_username';
+
+const features = [
+  { icon: UserSafetyIcon, title: 'RBAC 权限', desc: '菜单、按钮、接口一套模型,前后端一致校验' },
+  { icon: ApiIcon, title: 'OpenAPI 文档', desc: '注解生成接口文档,内置 Swagger 调试台' },
+  { icon: CloudUploadIcon, title: '前端直传', desc: 'OSS / COS / 七牛直传,本地磁盘兜底' },
+  { icon: CodeIcon, title: '代码生成', desc: '从数据表生成后端、前端页面与菜单' },
+];
 
 const router = useRouter();
 const route = useRoute();
@@ -139,100 +163,170 @@ const onSubmit: FormProps['onSubmit'] = async ({ validateResult }) => {
 </script>
 
 <style scoped>
-/* 布局与官方 starter login/index.less 对齐(less 转 css) */
-.login-wrapper {
+.login {
+  display: flex;
+  min-height: 100vh;
+  background: #fff;
+}
+
+/* ---------- 左侧品牌区 ---------- */
+.login-brand {
   position: relative;
   display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background-color: #fff;
-  background-image: url('@/assets/assets-login-bg-white.png');
-  background-size: cover;
-  background-position: 100%;
+  flex: 0 0 46%;
+  align-items: center;
+  padding: 64px;
+  overflow: hidden;
+  color: #fff;
+  background: linear-gradient(150deg, #0c6e52 0%, #16a37a 55%, #3fc39c 100%);
 }
 
-.login-header {
+.login-brand__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 440px;
+}
+
+.login-brand__logo {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  height: var(--td-comp-size-xxxl, 64px);
-  padding: 0 var(--td-comp-paddingLR-xl, 24px);
-  color: var(--td-text-color-primary);
-  backdrop-filter: blur(10px);
+  gap: 10px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
 }
 
-.login-header .logo {
-  font-size: 22px;
+.login-brand__logo img {
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.login-brand h1 {
+  margin: 48px 0 12px;
+  font-size: 36px;
   font-weight: 700;
   letter-spacing: 1px;
-  color: var(--td-brand-color, #0052d9);
 }
 
-.login-container {
-  position: absolute;
-  top: 22%;
-  left: 5%;
-  min-height: 500px;
+.login-brand__slogan {
+  margin: 0 0 48px;
+  font-size: 15px;
+  opacity: 0.85;
 }
 
-.title-container .title {
+.login-features {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 0;
   margin: 0;
-  margin-top: var(--td-comp-margin-xs, 4px);
-  font: var(--td-font-headline-large, 600 36px/44px sans-serif);
-  color: var(--td-text-color-primary);
+  list-style: none;
 }
 
-.title-container .title.margin-no {
-  margin-top: 0;
-}
-
-.sub-title {
-  margin-top: var(--td-comp-margin-xxl, 24px);
-}
-
-.sub-title .tip {
-  display: inline-block;
-  margin: 0;
-  margin-right: var(--td-comp-margin-s, 8px);
-  font: var(--td-font-body-medium, 400 14px/22px sans-serif);
-  color: var(--td-text-color-secondary);
-}
-
-.item-container {
-  width: 400px;
-  margin-top: var(--td-comp-margin-xxxxl, 36px);
-}
-
-.check-container {
+.login-features li {
   display: flex;
   align-items: center;
-  font: var(--td-font-body-medium, 400 14px/22px sans-serif);
-  color: var(--td-text-color-secondary);
+  gap: 14px;
 }
 
-.check-container.remember-pwd {
-  justify-content: space-between;
-  margin-bottom: var(--td-comp-margin-l, 16px);
+.login-features strong {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
 }
 
-.btn-container {
-  margin-top: var(--td-comp-margin-xxxxl, 36px);
+.login-features small {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.login-features__icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.16);
+  border-radius: 10px;
+  backdrop-filter: blur(4px);
+}
+
+.login-brand__circle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.login-brand__circle--a {
+  right: -140px;
+  bottom: -160px;
+  width: 420px;
+  height: 420px;
+}
+
+.login-brand__circle--b {
+  top: -60px;
+  left: -60px;
+  width: 220px;
+  height: 220px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ---------- 右侧登录卡片 ---------- */
+.login-panel {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 380px;
+}
+
+.login-card h2 {
+  margin: 0 0 6px;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--tl-text-1);
+}
+
+.login-card__hint {
+  margin: 0 0 28px;
+  font-size: 14px;
+  color: var(--tl-text-2);
+}
+
+.login-card__remember {
+  margin-bottom: 20px;
+}
+
+.login-card__submit {
+  height: 46px;
+  font-size: 16px;
+  letter-spacing: 2px;
 }
 
 .psw-toggle {
   cursor: pointer;
 }
 
-.copyright {
-  position: absolute;
-  bottom: 64px;
-  left: 5%;
-  font: var(--td-font-body-medium, 400 14px/22px sans-serif);
-  color: var(--td-text-color-secondary);
+.login-panel__copyright {
+  margin-top: 60px;
+  font-size: 12px;
+  color: var(--tl-text-3);
 }
 
-@media screen and (height <= 700px) {
-  .copyright {
+@media (max-width: 900px) {
+  .login-brand {
     display: none;
   }
 }

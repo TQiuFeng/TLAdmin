@@ -8,7 +8,7 @@ import http from '@/utils/request';
 export interface IntegrationField {
   field: string;
   label: string;
-  type: 'text' | 'password' | 'textarea' | 'select' | 'checkbox' | 'switch';
+  type: 'text' | 'password' | 'textarea' | 'select' | 'checkbox' | 'switch' | 'number';
   options?: string[];
   secret: boolean;
 }

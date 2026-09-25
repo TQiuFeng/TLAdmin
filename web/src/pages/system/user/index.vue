@@ -135,7 +135,7 @@ const columns = [
   { colKey: 'dept_name', title: '部门', width: 110 },
   { colKey: 'status', title: '状态', width: 80 },
   { colKey: 'last_login_time', title: '最后登录', width: 170 },
-  { colKey: 'op', title: '操作', width: 240, fixed: 'right' as const },
+  { colKey: 'op', title: '操作', width: 300, fixed: 'right' as const },
 ];
 
 // ---- 下拉数据 ----
