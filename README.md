@@ -87,7 +87,7 @@ TLAdmin 后端和前端都提供了统一工具库，业务代码可以直接复
 
 ### 仪表盘
 
-当前账号的角色、权限点、可见菜单和常用功能入口。
+管理员、角色、会员、今日登录统计，近 7 天操作量和最近登录；每块按当前账号的查看权限显示，没有权限的不出现。
 
 ![仪表盘](docs/screenshots/dashboard.png)
 
@@ -274,6 +274,8 @@ php bin/console schedule:run     # 执行到期定时任务(配合系统 crontab
 php bin/console queue:work       # 队列消费(--once 只消费一条)
 php bin/console queue:size       # 查看队列积压
 php bin/console gen:crud 表名 --title=名称   # 生成 CRUD 全套代码
+php tests/run.php                # 运行测试(需要数据库的用例在库不可用时跳过;有失败时退出码为 1)
+php tests/run.php Generator      # 只运行文件名包含 Generator 的测试
 
 cd web
 npm run dev                      # 开发
@@ -1105,7 +1107,7 @@ CLI：
 php bin/console gen:crud <表名> [--title=标题] [--force]
 ```
 
-控件：`input` 输入框、`textarea` 多行文本、`number` 数字、`switch` 开关（`status` 显示启用/禁用，其他如 `is_top` 显示是/否）、`datetime` 日期时间（库里存秒级时间戳）。字段名以 `_time` / `_at` 结尾自动识别为日期时间，`text` 类型和 `remark` 自动用多行文本。
+控件：`input` 输入框、`textarea` 多行文本、`number` 数字、`money` 金额（库里存分，页面按元显示和输入；注释写"(分)"或字段以 `_fen` 结尾自动识别）、`switch` 开关（`status` 显示启用/禁用，其他如 `is_top` 显示是/否）、`datetime` 日期时间（库里存秒级时间戳）。字段名以 `_time` / `_at` 结尾自动识别为日期时间，默认按日期区间搜索；`text` 类型和 `remark` 自动用多行文本。搜索方式：`like` 模糊、`eq` 精确、`between` 区间。
 
 演示中心：
 
@@ -1114,10 +1116,10 @@ php bin/console gen:crud <表名> [--title=标题] [--force]
 
 | 菜单 | 数据表 | 演示点 |
 | --- | --- | --- |
-| 演示商品 | `tl_demo_product` | 默认字段配置，CLI 一条命令生成 |
-| 演示文章 | `tl_demo_article` | 模糊/精确搜索、置顶开关、发布时间、长文本不进列表 |
+| 演示商品 | `tl_demo_product` | 默认字段配置，CLI 一条命令生成；价格按分存、自动识别为金额 |
+| 演示文章 | `tl_demo_article` | 模糊/精确搜索、置顶开关、发布时间区间搜索、长文本不进列表 |
 | 演示客户 | `tl_demo_customer` | 多条件搜索、数字等级、下次跟进时间 |
-| 演示订单 | `tl_demo_order` | 订单号精确搜索、支付开关 + 支付时间、没有状态字段的表 |
+| 演示订单 | `tl_demo_order` | 订单号精确搜索、支付开关 + 支付时间区间搜索、没有状态字段的表 |
 | 演示公告 | `tl_demo_notice` | 生效/失效两个时间字段、置顶 |
 
 样例数据和"演示中心"目录由 `database/seeders/sample_demo_data.php` 写入：只在表为空时写入，可重复执行。不需要演示时，删除对应菜单即可。

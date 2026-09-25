@@ -43,6 +43,8 @@ final class DemoArticleController extends BaseController
                 'author' => (string) $this->query('author', ''),
                 'category' => (string) $this->query('category', ''),
                 'is_top' => (string) $this->query('is_top', ''),
+                'publish_time_start' => (string) $this->query('publish_time_start', ''),
+                'publish_time_end' => (string) $this->query('publish_time_end', ''),
                 'status' => (string) $this->query('status', ''),
             ],
             max(1, (int) $this->query('page', 1)),

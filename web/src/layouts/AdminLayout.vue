@@ -4,16 +4,16 @@
 -->
 <template>
   <div class="admin-layout">
-    <aside class="layout-aside" :class="{ collapsed }">
+    <aside class="layout-aside" :class="{ collapsed: menuCollapsed }">
       <router-link to="/" class="layout-brand">
         <img :src="logoUrl" alt="TLAdmin" />
-        <span v-show="!collapsed" class="layout-brand__name">TLAdmin<em>管理后台</em></span>
+        <span v-show="!menuCollapsed" class="layout-brand__name">TLAdmin<em>管理后台</em></span>
       </router-link>
       <t-menu
         theme="light"
         v-model:expanded="expanded"
         :value="activePath"
-        :collapsed="collapsed"
+        :collapsed="menuCollapsed"
         :width="['220px', '64px']"
         expand-mutex
         class="layout-menu"
@@ -25,13 +25,13 @@
     <div class="layout-main">
       <header class="layout-header">
         <div class="header-left">
-          <t-tooltip :content="collapsed ? '展开菜单' : '收起菜单'" placement="bottom">
-            <button class="header-icon-btn" type="button" @click="collapsed = !collapsed">
-              <menu-unfold-icon v-if="collapsed" size="18px" />
+          <t-tooltip :content="menuCollapsed ? '展开菜单' : '收起菜单'" placement="bottom">
+            <button class="header-icon-btn" type="button" @click="toggleMenu">
+              <menu-unfold-icon v-if="menuCollapsed" size="18px" />
               <menu-fold-icon v-else size="18px" />
             </button>
           </t-tooltip>
-          <t-breadcrumb>
+          <t-breadcrumb class="header-breadcrumb">
             <t-breadcrumb-item v-for="item in breadcrumbs" :key="item">{{ item }}</t-breadcrumb-item>
           </t-breadcrumb>
         </div>
@@ -124,7 +124,30 @@ watch(collapsed, (value) => {
   }
 });
 
+// ---- 窄屏(< 1024px)自动收起菜单;点按钮临时展开,切换页面后再收起,不改宽屏下记住的状态 ----
+const NARROW_WIDTH = 1024;
+const narrow = ref(window.innerWidth < NARROW_WIDTH);
+const narrowExpanded = ref(false);
+
+const menuCollapsed = computed(() => (narrow.value ? !narrowExpanded.value : collapsed.value));
+
+function toggleMenu(): void {
+  if (narrow.value) {
+    narrowExpanded.value = !narrowExpanded.value;
+  } else {
+    collapsed.value = !collapsed.value;
+  }
+}
+
+function syncNarrow(): void {
+  narrow.value = window.innerWidth < NARROW_WIDTH;
+}
+
 const activePath = computed(() => route.path);
+
+watch(activePath, () => {
+  narrowExpanded.value = false;
+});
 
 // ---- 展开当前页所在的目录(直接打开深层地址或刷新时,侧栏也能定位到当前菜单) ----
 const expanded = ref<Array<string | number>>([]);
@@ -244,8 +267,14 @@ function toggleFullscreen(): void {
   }
 }
 
-onMounted(() => document.addEventListener('fullscreenchange', syncFullscreen));
-onBeforeUnmount(() => document.removeEventListener('fullscreenchange', syncFullscreen));
+onMounted(() => {
+  document.addEventListener('fullscreenchange', syncFullscreen);
+  window.addEventListener('resize', syncNarrow);
+});
+onBeforeUnmount(() => {
+  document.removeEventListener('fullscreenchange', syncFullscreen);
+  window.removeEventListener('resize', syncNarrow);
+});
 </script>
 
 <style scoped>
@@ -480,5 +509,20 @@ onBeforeUnmount(() => document.removeEventListener('fullscreenchange', syncFulls
   min-height: 0;
   padding: 20px;
   overflow: auto;
+}
+/* ---------- 窄屏 ---------- */
+@media (max-width: 768px) {
+  .header-breadcrumb,
+  .header-user__meta {
+    display: none;
+  }
+
+  .layout-header {
+    padding: 0 12px 0 8px;
+  }
+
+  .layout-content {
+    padding: 12px;
+  }
 }
 </style>

@@ -12,6 +12,17 @@
         <t-option label="是" :value="1" />
         <t-option label="否" :value="0" />
       </t-select>
+      <t-date-range-picker
+        :value="query.pay_time_start ? [Number(query.pay_time_start) * 1000, Number(query.pay_time_end) * 1000] : []"
+        value-type="time-stamp"
+        clearable
+        :placeholder="['支付时间起', '支付时间止']"
+        @change="(v: unknown) => {
+          const [start, end] = (v as number[]) ?? [];
+          query.pay_time_start = start ? String(Math.floor(start / 1000)) : '';
+          query.pay_time_end = end ? String(Math.floor(end / 1000) + 86399) : '';
+        }"
+      />
     </template>
 
     <template #toolbar>
@@ -91,7 +102,7 @@ import {
 import { formatDate } from '@/utils/date';
 
 const tableRef = ref<TablePlusExpose>();
-const query = reactive({ order_no: '', customer_name: '', is_paid: '' as string | number, });
+const query = reactive({ order_no: '', customer_name: '', is_paid: '' as string | number, pay_time_start: '', pay_time_end: '', });
 
 const columns = [
   { colKey: 'id', title: 'ID', width: 70 },

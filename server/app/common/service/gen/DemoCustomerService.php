@@ -40,6 +40,12 @@ final class DemoCustomerService
         if (($filters['source'] ?? '') !== '') {
             $query->where('source', $filters['source']);
         }
+        if (($filters['next_follow_time_start'] ?? '') !== '') {
+            $query->where('next_follow_time', '>=', (int) $filters['next_follow_time_start']);
+        }
+        if (($filters['next_follow_time_end'] ?? '') !== '') {
+            $query->where('next_follow_time', '<=', (int) $filters['next_follow_time_end']);
+        }
         if (($filters['status'] ?? '') !== '') {
             $query->where('status', (int) $filters['status']);
         }

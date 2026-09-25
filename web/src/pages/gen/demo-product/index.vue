@@ -19,6 +19,7 @@
       </t-button>
     </template>
 
+    <template #price="{ row }">{{ formatMoney(row.price, { fromFen: true }) }}</template>
     <template #status="{ row }">
       <t-tag :theme="row.status === 1 ? 'success' : 'danger'" variant="light">
         {{ row.status === 1 ? '启用' : '禁用' }}
@@ -43,7 +44,15 @@
         <t-input v-model="form.name" placeholder="请输入商品名称" />
       </t-form-item>
       <t-form-item label="价格" name="price">
-        <t-input-number v-model="form.price" />
+        <t-input-number
+          :value="form.price / 100"
+          :decimal-places="2"
+          :min="0"
+          theme="normal"
+          suffix="元"
+          style="width: 200px"
+          @change="(v: unknown) => (form.price = Math.round(Number(v || 0) * 100))"
+        />
       </t-form-item>
       <t-form-item label="库存" name="stock">
         <t-input-number v-model="form.stock" />
@@ -72,6 +81,7 @@ import {
   type DemoProductItem, type DemoProductForm,
 } from '@/api/gen/demo_product';
 import { formatDate } from '@/utils/date';
+import { formatMoney } from '@/utils/money';
 
 const tableRef = ref<TablePlusExpose>();
 const query = reactive({ name: '', status: '' as string | number, });

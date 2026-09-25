@@ -390,8 +390,8 @@ async function runQrcode(): Promise<void> {
 }
 
 /** 示例区划:把省 → 市 → 区县三级选项挂成树,级联框才能直接显示已选名称 */
-function applyRegionSample(sample: { selected: string[]; levels: RegionItem[][]; detail: RegionDetail }): void {
-  const levels = sample.levels.map(toOptions);
+function applyRegionSample(sample: { selected: string[]; levels: { items: RegionItem[] }[]; detail: RegionDetail }): void {
+  const levels = sample.levels.map((level) => toOptions(level.items));
   for (let i = 0; i < levels.length - 1; i++) {
     const parent = levels[i]!.find((o) => o.value === sample.selected[i]);
     if (parent) parent.children = levels[i + 1]!;

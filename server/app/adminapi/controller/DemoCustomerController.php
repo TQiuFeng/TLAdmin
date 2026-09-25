@@ -43,6 +43,8 @@ final class DemoCustomerController extends BaseController
                 'contact' => (string) $this->query('contact', ''),
                 'mobile' => (string) $this->query('mobile', ''),
                 'source' => (string) $this->query('source', ''),
+                'next_follow_time_start' => (string) $this->query('next_follow_time_start', ''),
+                'next_follow_time_end' => (string) $this->query('next_follow_time_end', ''),
                 'status' => (string) $this->query('status', ''),
             ],
             max(1, (int) $this->query('page', 1)),

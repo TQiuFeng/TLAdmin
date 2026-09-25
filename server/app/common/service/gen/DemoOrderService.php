@@ -37,6 +37,12 @@ final class DemoOrderService
         if (($filters['is_paid'] ?? '') !== '') {
             $query->where('is_paid', (int) $filters['is_paid']);
         }
+        if (($filters['pay_time_start'] ?? '') !== '') {
+            $query->where('pay_time', '>=', (int) $filters['pay_time_start']);
+        }
+        if (($filters['pay_time_end'] ?? '') !== '') {
+            $query->where('pay_time', '<=', (int) $filters['pay_time_end']);
+        }
 
         // 统计总数:克隆查询,避免被后面的 field/分页影响
         $total = (clone $query)->count();

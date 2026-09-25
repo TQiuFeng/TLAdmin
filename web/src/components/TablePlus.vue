@@ -146,9 +146,13 @@ defineExpose({ reload, refresh });
 
 .search-row :deep(.t-input__wrap),
 .search-row :deep(.t-select__wrap),
-.search-row :deep(.t-select-input),
-.search-row :deep(.t-range-input) {
+.search-row :deep(.t-select-input) {
   width: 200px;
+}
+
+/* 日期区间放两个日期,200px 放不下 */
+.search-row :deep(.t-range-input) {
+  width: 280px;
 }
 
 .search-actions {

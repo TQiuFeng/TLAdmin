@@ -9,7 +9,8 @@ use think\facade\Db;
  * 前端 api/页面、菜单种子,全部贴合 TLAdmin 现有规范(注解路由 + VO + TablePlus)。
  *
  * 字段可配置:每个字段是否进列表(list)、搜索(search + search_type)、表单(form),
- * 以及表单控件类型(component: input/textarea/number/switch/datetime)。
+ * 以及表单控件类型(component: input/textarea/number/money/switch/datetime)。
+ * 搜索方式:like 模糊、eq 精确、between 区间(时间字段,按 字段_start / 字段_end 传秒级时间戳)。
  *
  * CLI 用法:php bin/console gen:crud tl_demo_product --title=演示商品(用默认字段配置)
  * 可视化:后台代码生成器页可逐字段配置并预览代码。
@@ -28,7 +29,10 @@ final class CrudGenerator
     private array $resolved = [];
 
     /** 可选的表单控件类型 */
-    public const COMPONENTS = ['input', 'textarea', 'number', 'switch', 'datetime'];
+    public const COMPONENTS = ['input', 'textarea', 'number', 'money', 'switch', 'datetime'];
+
+    /** 可选的搜索方式 */
+    public const SEARCH_TYPES = ['like', 'eq', 'between'];
 
     public function __construct(
         private readonly string $serverPath,
@@ -162,6 +166,9 @@ final class CrudGenerator
                 $component = 'datetime';
             } elseif ($isText || $name === 'remark') {
                 $component = 'textarea';
+            } elseif ($isInt && $this->isMoney($col)) {
+                // 注释写明"(分)"或字段以 _fen 结尾:库里存分,页面按元显示和输入
+                $component = 'money';
             } elseif ($isInt) {
                 $component = 'number';
             }
@@ -176,7 +183,11 @@ final class CrudGenerator
                 'system' => $system,
                 'list' => $name !== 'delete_time',
                 'search' => in_array($name, ['name', 'title', 'code', 'username', 'status'], true),
-                'search_type' => $name === 'status' ? 'eq' : 'like',
+                'search_type' => match (true) {
+                    $isTime => 'between',
+                    $name === 'status' => 'eq',
+                    default => 'like',
+                },
                 'form' => !$system && $name !== 'delete_time',
                 'component' => $component,
             ];
@@ -186,6 +197,13 @@ final class CrudGenerator
                     if (isset($overrides[$name][$strKey]) && $overrides[$name][$strKey] !== '') {
                         $def[$strKey] = (string) $overrides[$name][$strKey];
                     }
+                }
+                // 不认识的控件 / 搜索方式回退到推断值,避免生成出坏代码
+                if (!in_array($def['component'], self::COMPONENTS, true)) {
+                    $def['component'] = $component;
+                }
+                if (!in_array($def['search_type'], self::SEARCH_TYPES, true)) {
+                    $def['search_type'] = 'like';
                 }
                 foreach (['list', 'search', 'form'] as $boolKey) {
                     if (array_key_exists($boolKey, $overrides[$name])) {
@@ -202,6 +220,10 @@ final class CrudGenerator
             if ($system) {
                 $def['form'] = false;
             }
+            // 区间搜索只对时间字段有意义
+            if ($def['search_type'] === 'between' && $def['component'] !== 'datetime') {
+                $def['search_type'] = 'eq';
+            }
 
             $resolved[] = $def;
         }
@@ -217,6 +239,12 @@ final class CrudGenerator
     private function switchLabels(array $col): array
     {
         return $col['name'] === 'status' ? ['启用', '禁用'] : ['是', '否'];
+    }
+
+    /** 金额字段:整数列,注释里写明"(分)"或字段名以 _fen 结尾 */
+    private function isMoney(array $col): bool
+    {
+        return preg_match('/[(（]分[)）]/u', $col['comment']) === 1 || str_ends_with($col['name'], '_fen');
     }
 
     private function isInt(array $col): bool
@@ -315,6 +343,16 @@ PHP;
 
         if ((\$filters['{$name}'] ?? '') !== '') {
             \$query->whereLike('{$name}', '%' . \$filters['{$name}'] . '%');
+        }
+PHP;
+            } elseif ($col['search_type'] === 'between') {
+                $filters .= <<<PHP
+
+        if ((\$filters['{$name}_start'] ?? '') !== '') {
+            \$query->where('{$name}', '>=', (int) \$filters['{$name}_start']);
+        }
+        if ((\$filters['{$name}_end'] ?? '') !== '') {
+            \$query->where('{$name}', '<=', (int) \$filters['{$name}_end']);
         }
 PHP;
             } else {
@@ -467,7 +505,10 @@ PHP;
     {
         $searchParams = '';
         foreach ($this->searchColumns() as $col) {
-            $searchParams .= "                '{$col['name']}' => (string) \$this->query('{$col['name']}', ''),\n";
+            $keys = $col['search_type'] === 'between' ? ["{$col['name']}_start", "{$col['name']}_end"] : [$col['name']];
+            foreach ($keys as $key) {
+                $searchParams .= "                '{$key}' => (string) \$this->query('{$key}', ''),\n";
+            }
         }
 
         // 请求体字段声明(让 Swagger UI 显示具体参数,而非空对象)
@@ -660,6 +701,7 @@ TS;
     private function renderPage(): string
     {
         $needFormatDate = false;
+        $needFormatMoney = false;
 
         // 表格列
         $tableColumns = '';
@@ -688,6 +730,9 @@ HTML;
             } elseif ($col['component'] === 'datetime') {
                 $needFormatDate = true;
                 $columnSlots .= "\n    <template #{$name}=\"{ row }\">{{ formatDate(row.{$name}) }}</template>";
+            } elseif ($col['component'] === 'money') {
+                $needFormatMoney = true;
+                $columnSlots .= "\n    <template #{$name}=\"{ row }\">{{ formatMoney(row.{$name}, { fromFen: true }) }}</template>";
             }
         }
 
@@ -702,6 +747,22 @@ HTML;
         <t-option label="{$on}" :value="1" />
         <t-option label="{$off}" :value="0" />
       </t-select>
+
+HTML;
+            } elseif ($col['search_type'] === 'between') {
+                // 日期区间:库里存秒级时间戳;结束日取当天 23:59:59
+                $searchInputs .= <<<HTML
+      <t-date-range-picker
+        :value="query.{$name}_start ? [Number(query.{$name}_start) * 1000, Number(query.{$name}_end) * 1000] : []"
+        value-type="time-stamp"
+        clearable
+        :placeholder="['{$col['label']}起', '{$col['label']}止']"
+        @change="(v: unknown) => {
+          const [start, end] = (v as number[]) ?? [];
+          query.{$name}_start = start ? String(Math.floor(start / 1000)) : '';
+          query.{$name}_end = end ? String(Math.floor(end / 1000) + 86399) : '';
+        }"
+      />
 
 HTML;
             } else {
@@ -748,6 +809,21 @@ HTML,
       </t-form-item>
 
 HTML,
+                // 金额库里存分,输入框按元显示,改动时换算回分
+                'money' => <<<HTML
+      <t-form-item label="{$label}" name="{$name}">
+        <t-input-number
+          :value="form.{$name} / 100"
+          :decimal-places="2"
+          :min="0"
+          theme="normal"
+          suffix="元"
+          style="width: 200px"
+          @change="(v: unknown) => (form.{$name} = Math.round(Number(v || 0) * 100))"
+        />
+      </t-form-item>
+
+HTML,
                 'textarea' => <<<HTML
       <t-form-item label="{$label}" name="{$name}">
         <t-textarea v-model="form.{$name}" placeholder="请输入{$label}" />
@@ -780,13 +856,16 @@ HTML,
         // 搜索条件初值
         $searchQuery = '';
         foreach ($this->searchColumns() as $col) {
-            $searchQuery .= $col['component'] === 'switch'
-                ? "{$col['name']}: '' as string | number, "
-                : "{$col['name']}: '', ";
+            $searchQuery .= match (true) {
+                $col['search_type'] === 'between' => "{$col['name']}_start: '', {$col['name']}_end: '', ",
+                $col['component'] === 'switch' => "{$col['name']}: '' as string | number, ",
+                default => "{$col['name']}: '', ",
+            };
         }
 
         $camelPlural = 'list' . $this->entity . 's';
         $formatDateImport = $needFormatDate ? "\nimport { formatDate } from '@/utils/date';" : '';
+        $formatDateImport .= $needFormatMoney ? "\nimport { formatMoney } from '@/utils/money';" : '';
 
         return <<<VUE
 <!--

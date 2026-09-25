@@ -64,6 +64,16 @@ return [
             $changed = true;
         };
 
+        // 价格按分存,页面按元显示(代码生成器识别注释里的"(分)"生成金额控件)
+        $fill('tl_demo_product', [
+            ['name' => '无线蓝牙耳机', 'price' => 19900, 'stock' => 320, 'status' => 1, 'remark' => ''],
+            ['name' => '机械键盘', 'price' => 45900, 'stock' => 86, 'status' => 1, 'remark' => '青轴'],
+            ['name' => '人体工学椅', 'price' => 129900, 'stock' => 24, 'status' => 1, 'remark' => ''],
+            ['name' => '27 寸显示器', 'price' => 189900, 'stock' => 15, 'status' => 1, 'remark' => ''],
+            ['name' => 'USB-C 扩展坞', 'price' => 23900, 'stock' => 140, 'status' => 1, 'remark' => ''],
+            ['name' => '降噪头戴耳机', 'price' => 159900, 'stock' => 0, 'status' => 0, 'remark' => '缺货下架'],
+        ]);
+
         $fill('tl_demo_article', [
             ['title' => 'TLAdmin 快速上手:十分钟跑起第一个后台', 'author' => '秋风', 'category' => '入门', 'summary' => '从安装依赖、执行迁移到登录后台的完整步骤。', 'content' => "1. 安装依赖\n2. 配置 .env\n3. php bin/console migrate && php bin/console seed\n4. 启动前后端", 'views' => 1286, 'is_top' => 1, 'publish_time' => $now - 20 * $day, 'status' => 1],
             ['title' => '用代码生成器十秒生成一个 CRUD 模块', 'author' => '秋风', 'category' => '入门', 'summary' => '建表、选字段、预览、生成,菜单和权限一并写好。', 'content' => '本页就是代码生成器生成的。', 'views' => 932, 'is_top' => 1, 'publish_time' => $now - 15 * $day, 'status' => 1],

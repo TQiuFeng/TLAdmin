@@ -124,7 +124,7 @@ export interface ToolboxSamples {
   money: MoneyResult;
   qrcode: { content: string; image: string };
   user_agent: UserAgentResult;
-  region: { selected: string[]; levels: RegionItem[][]; detail: RegionDetail };
+  region: { selected: string[]; levels: { items: RegionItem[] }[]; detail: RegionDetail };
 }
 
 export const getSamples = () => http.get<ToolboxSamples>(`${BASE}/samples`);

@@ -55,6 +55,7 @@
           <t-select v-model="row.search_type" size="small" :disabled="!row.search" style="width: 96px">
             <t-option label="模糊" value="like" />
             <t-option label="精确" value="eq" />
+            <t-option label="区间(时间)" value="between" />
           </t-select>
         </template>
         <template #form="{ row }">
@@ -120,7 +121,8 @@ const COMPONENT_OPTIONS = [
   { label: '输入框', value: 'input' },
   { label: '多行文本', value: 'textarea' },
   { label: '数字', value: 'number' },
-  { label: '开关(启用/禁用)', value: 'switch' },
+  { label: '金额(存分,按元显示)', value: 'money' },
+  { label: '开关(status 启用/禁用,其他是/否)', value: 'switch' },
   { label: '日期时间', value: 'datetime' },
 ];
 

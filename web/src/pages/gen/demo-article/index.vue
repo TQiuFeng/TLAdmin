@@ -13,6 +13,17 @@
         <t-option label="是" :value="1" />
         <t-option label="否" :value="0" />
       </t-select>
+      <t-date-range-picker
+        :value="query.publish_time_start ? [Number(query.publish_time_start) * 1000, Number(query.publish_time_end) * 1000] : []"
+        value-type="time-stamp"
+        clearable
+        :placeholder="['发布时间起', '发布时间止']"
+        @change="(v: unknown) => {
+          const [start, end] = (v as number[]) ?? [];
+          query.publish_time_start = start ? String(Math.floor(start / 1000)) : '';
+          query.publish_time_end = end ? String(Math.floor(end / 1000) + 86399) : '';
+        }"
+      />
       <t-select v-model="query.status" placeholder="状态" clearable>
         <t-option label="启用" :value="1" />
         <t-option label="禁用" :value="0" />
@@ -107,7 +118,7 @@ import {
 import { formatDate } from '@/utils/date';
 
 const tableRef = ref<TablePlusExpose>();
-const query = reactive({ title: '', author: '', category: '', is_top: '' as string | number, status: '' as string | number, });
+const query = reactive({ title: '', author: '', category: '', is_top: '' as string | number, publish_time_start: '', publish_time_end: '', status: '' as string | number, });
 
 const columns = [
   { colKey: 'id', title: 'ID', width: 70 },

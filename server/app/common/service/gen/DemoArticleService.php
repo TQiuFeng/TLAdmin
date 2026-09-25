@@ -40,6 +40,12 @@ final class DemoArticleService
         if (($filters['is_top'] ?? '') !== '') {
             $query->where('is_top', (int) $filters['is_top']);
         }
+        if (($filters['publish_time_start'] ?? '') !== '') {
+            $query->where('publish_time', '>=', (int) $filters['publish_time_start']);
+        }
+        if (($filters['publish_time_end'] ?? '') !== '') {
+            $query->where('publish_time', '<=', (int) $filters['publish_time_end']);
+        }
         if (($filters['status'] ?? '') !== '') {
             $query->where('status', (int) $filters['status']);
         }

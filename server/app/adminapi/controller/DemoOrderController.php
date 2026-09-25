@@ -42,6 +42,8 @@ final class DemoOrderController extends BaseController
                 'order_no' => (string) $this->query('order_no', ''),
                 'customer_name' => (string) $this->query('customer_name', ''),
                 'is_paid' => (string) $this->query('is_paid', ''),
+                'pay_time_start' => (string) $this->query('pay_time_start', ''),
+                'pay_time_end' => (string) $this->query('pay_time_end', ''),
             ],
             max(1, (int) $this->query('page', 1)),
             min(100, max(1, (int) $this->query('page_size', 20)))
