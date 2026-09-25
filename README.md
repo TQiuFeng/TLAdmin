@@ -155,16 +155,35 @@ C 端会员后台管理，与后台管理员账号体系分离。
 
 | 部分 | 技术 | 说明 |
 |---|---|---|
-| 服务端 | PHP 8.2+<br>ThinkPHP 8<br>think-orm | 控制器方法上的注解同时生成路由、权限和 OpenAPI 文档；统一返回 code/message/data/request_id/timestamp，支持 JSON / XML |
-| 数据 | MySQL 8<br>Redis<br>MongoDB | MySQL 存业务数据；Redis 存 token、登录失败计数、接口限流计数和队列；MongoDB 存操作日志、登录日志、第三方请求日志 |
-| 后台前端 | Vue 3<br>TypeScript<br>Vite<br>TDesign Vue Next<br>Pinia / Vue Router / Axios | 按后端菜单树生成动态路由，v-permission 控制按钮；请求层统一带 token，401 自动刷新 token 后重放 |
-| 认证 | access + refresh token<br>pragmarx/google2fa | token 存 Redis，登录失败锁定；可开启 Google Authenticator 动态验证码 |
-| 支付 | yansongda/pay | 微信支付、支付宝统一 Service；密钥加密存库，接口返回脱敏 |
-| 微信 | EasyWeChat | 公众号配置，小程序登录与手机号一键授权 |
-| 短信 | EasySms | 阿里云、腾讯云，后台选哪家就用哪家 |
-| 存储 | 阿里云 OSS SDK<br>腾讯云 COS SDK<br>七牛 SDK | 后端签发上传凭证、前端直传云端，本地磁盘兜底 |
-| 工具库 | overtrue/pinyin<br>overtrue/php-opencc<br>6tail/lunar-php<br>bacon/bacon-qr-code<br>Carbon / Guzzle | 拼音、简繁转换、万年历与节假日、二维码、日期、HTTP；手机号 / IP 归属地、五级行政区划、敏感词读本地数据文件，不调用外部接口 |
-| 接口文档 | zircote/swagger-php<br>Swagger UI | 注解生成 OpenAPI，内置调试台，可设访问密码 |
+| 服务端 | PHP 8.2+ | 运行环境；行政区划需 pdo_sqlite 扩展，二维码需 gd 扩展 |
+|  | ThinkPHP 8 | 框架底座；控制器方法上的注解同时生成路由、权限和 OpenAPI 文档 |
+|  | think-orm | 数据库访问；迁移和种子统一放在 database/migrations、database/seeders |
+| 数据 | MySQL 8 | 业务数据：管理员、角色、菜单、配置、会员等 |
+|  | Redis | access / refresh token、登录失败计数、接口限流计数、队列 |
+|  | MongoDB | 操作日志、登录日志、第三方请求日志，按 request_id 检索 |
+| 后台前端 | Vue 3 + TypeScript | 按后端菜单树生成动态路由，v-permission 控制按钮权限 |
+|  | Vite | 开发代理到后端，构建产物可直接部署到 server/public/admin |
+|  | TDesign Vue Next | 组件库；通用组件 TablePlus、FormDialog、UploadPlus 基于它封装 |
+|  | Pinia | 登录态、用户信息、菜单树、权限集合 |
+|  | Vue Router | 动态路由和登录守卫 |
+|  | Axios | 统一请求层：自动带 token，401 自动刷新 token 后重放，统一错误提示 |
+| 认证 | access + refresh token | token 存 Redis，登录失败自动锁定 |
+|  | pragmarx/google2fa | Google Authenticator 动态验证码，可全局开启 |
+| 第三方 | yansongda/pay | 微信支付、支付宝；密钥加密存库，接口返回脱敏 |
+|  | EasyWeChat | 公众号配置，小程序登录与手机号一键授权 |
+|  | EasySms | 短信：阿里云、腾讯云，后台选哪家就用哪家 |
+|  | 阿里云 OSS SDK | 前端直传阿里云 OSS |
+|  | 腾讯云 COS SDK | 前端直传腾讯云 COS |
+|  | 七牛 SDK | 前端直传七牛云；都不配时落到本地磁盘 |
+| 工具库 | overtrue/pinyin | 拼音、首字母、URL 别名 |
+|  | overtrue/php-opencc | 简繁转换 |
+|  | 6tail/lunar-php | 万年历：农历、节气、节日、法定节假日与调休 |
+|  | bacon/bacon-qr-code | 二维码 |
+|  | Carbon | 日期处理 |
+|  | Guzzle | 统一 HTTP 客户端 |
+|  | 本地数据文件 | 手机号 / IP 归属地、五级行政区划、敏感词库，不调用外部接口 |
+| 接口文档 | zircote/swagger-php | 从注解和响应 VO 生成 OpenAPI |
+|  | Swagger UI | 内置调试台，可设访问密码 |
 
 ## 项目结构
 
