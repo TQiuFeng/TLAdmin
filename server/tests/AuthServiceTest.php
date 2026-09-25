@@ -6,18 +6,25 @@
  */
 
 use app\common\cache\RedisClient;
+use app\common\database\Mongo;
 use app\common\exception\BizException;
 use app\common\http\Request;
 use app\common\service\auth\AuthService;
+use app\common\service\log\LoginLogService;
 
 /** 登录请求;每个用例用不同 IP,失败计数互不影响 */
 $request = static fn (string $ip): Request => new Request('POST', '/adminapi/auth/login', [], [], [], '', ['REMOTE_ADDR' => $ip]);
 
-/** 用例结束清掉失败计数和发出的 token */
+/** 用例结束清掉失败计数、发出的 token 和写进 MongoDB 的登录日志 */
 $cleanupLogin = static function (TestContext $t, string $username, string $ip, int $userId): void {
     $t->defer(static function () use ($t, $username, $ip, $userId): void {
         RedisClient::delete("auth:login-fail:{$username}:{$ip}");
         $t->make(AuthService::class)->kickUser($userId);
+        try {
+            Mongo::collection(LoginLogService::COLLECTION)->deleteMany(['username' => $username]);
+        } catch (\Throwable) {
+            // MongoDB 不可用时没有写日志,也就不用清
+        }
     });
 };
 

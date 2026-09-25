@@ -37,6 +37,13 @@
         </div>
 
         <div class="header-right">
+          <t-dropdown :options="themeOptions" trigger="click" @click="(d: DropdownOption) => setThemeMode(d.value as ThemeMode)">
+            <button class="header-icon-btn" type="button" :aria-label="`主题:${THEME_LABELS[themeMode]}`">
+              <desktop-icon v-if="themeMode === 'auto'" size="18px" />
+              <moon-icon v-else-if="themeMode === 'dark'" size="18px" />
+              <sunny-icon v-else size="18px" />
+            </button>
+          </t-dropdown>
           <t-tooltip :content="isFullscreen ? '退出全屏' : '全屏'" placement="bottom">
             <button class="header-icon-btn" type="button" @click="toggleFullscreen">
               <fullscreen-exit-icon v-if="isFullscreen" size="18px" />
@@ -102,7 +109,11 @@ import {
   FullscreenExitIcon,
   ChevronDownIcon,
   CloseIcon,
+  SunnyIcon,
+  MoonIcon,
+  DesktopIcon,
 } from 'tdesign-icons-vue-next';
+import { setThemeMode, themeMode, type ThemeMode } from '@/utils/theme';
 import { useUserStore } from '@/stores/user';
 import type { MenuNode } from '@/types/auth';
 import MenuTree from '@/layouts/components/MenuTree.vue';
@@ -324,6 +335,17 @@ async function onUserMenuClick(data: DropdownOption): Promise<void> {
   }
 }
 
+// ---- 主题:浅色 / 暗色 / 跟随系统 ----
+const THEME_LABELS: Record<ThemeMode, string> = { light: '浅色', dark: '暗色', auto: '跟随系统' };
+
+const themeOptions = computed<DropdownProps['options']>(() =>
+  (Object.keys(THEME_LABELS) as ThemeMode[]).map((mode) => ({
+    content: THEME_LABELS[mode],
+    value: mode,
+    active: themeMode.value === mode,
+  })),
+);
+
 const isFullscreen = ref(false);
 
 function syncFullscreen(): void {
@@ -361,7 +383,7 @@ onBeforeUnmount(() => {
   flex: 0 0 auto;
   flex-direction: column;
   width: 220px;
-  background: #fff;
+  background: var(--tl-surface);
   border-right: 1px solid var(--tl-line);
   transition: width 0.2s ease;
 }
@@ -412,7 +434,7 @@ onBeforeUnmount(() => {
 
 .layout-menu :deep(.t-menu__item) {
   height: 42px;
-  color: #4b5563;
+  color: var(--tl-text-sub);
 }
 
 .layout-menu :deep(.t-menu__item.t-is-active:not(.t-is-opened)) {
@@ -445,7 +467,7 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   height: 56px;
   padding: 0 20px 0 12px;
-  background: #fff;
+  background: var(--tl-surface);
   border-bottom: 1px solid var(--tl-line);
 }
 
@@ -534,7 +556,7 @@ onBeforeUnmount(() => {
   gap: 6px;
   height: 40px;
   padding: 0 8px 0 12px;
-  background: #fff;
+  background: var(--tl-surface);
   border-bottom: 1px solid var(--tl-line);
 }
 

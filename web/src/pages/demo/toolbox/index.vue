@@ -534,7 +534,7 @@ onMounted(async () => {
   font: inherit;
   color: var(--tl-text-1);
   cursor: pointer;
-  background: #fff;
+  background: var(--tl-surface);
   border: 1px solid var(--tl-line);
   border-radius: 8px;
   transition: border-color 0.15s, background 0.15s;
@@ -550,7 +550,7 @@ onMounted(async () => {
 }
 
 .cal-cell.is-rest .cal-cell__day {
-  color: #e5484d;
+  color: var(--td-error-color);
 }
 
 .cal-cell.is-today {
@@ -603,12 +603,12 @@ onMounted(async () => {
 }
 
 .cal-cell__badge.is-work {
-  background: #f5a623;
+  background: var(--td-warning-color);
 }
 
 .cal-cell.is-selected .cal-cell__badge {
   color: var(--tl-primary);
-  background: #fff;
+  background: var(--tl-surface);
 }
 
 /* ---------- 当日详情 ---------- */
@@ -648,7 +648,7 @@ onMounted(async () => {
   margin-top: 16px;
   font-size: 13px;
   color: var(--tl-text-2);
-  background: #f7f9fa;
+  background: var(--tl-surface-2);
   border-radius: 8px;
 }
 
@@ -681,7 +681,7 @@ onMounted(async () => {
 }
 
 .kv dt.is-ji {
-  color: #e5484d;
+  color: var(--td-error-color);
 }
 
 .kv dd {
@@ -744,7 +744,7 @@ onMounted(async () => {
 }
 
 .warn {
-  color: #e5484d;
+  color: var(--td-error-color);
 }
 
 .yuan {
@@ -754,7 +754,7 @@ onMounted(async () => {
 .money {
   padding: 14px;
   margin-top: 8px;
-  background: #f7f9fa;
+  background: var(--tl-surface-2);
   border-radius: 8px;
 }
 
@@ -787,7 +787,7 @@ onMounted(async () => {
   line-height: 1.5;
   color: var(--tl-text-2);
   word-break: break-all;
-  background: #f7f9fa;
+  background: var(--tl-surface-2);
   border-radius: 6px;
 }
 

@@ -8,9 +8,13 @@ import { createPinia } from 'pinia';
 import App from '@/App.vue';
 import router from '@/router';
 import { permission } from '@/directives/permission';
+import { initTheme } from '@/utils/theme';
 
 import 'tdesign-vue-next/es/style/index.css';
 import '@/styles/global.css';
+
+// 挂载前应用主题,避免先闪一下浅色
+initTheme();
 
 const app = createApp(App);
 app.use(createPinia());

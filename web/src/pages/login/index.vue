@@ -166,7 +166,7 @@ const onSubmit: FormProps['onSubmit'] = async ({ validateResult }) => {
 .login {
   display: flex;
   min-height: 100vh;
-  background: #fff;
+  background: var(--tl-surface);
 }
 
 /* ---------- 左侧品牌区 ---------- */

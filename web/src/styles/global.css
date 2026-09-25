@@ -32,17 +32,49 @@
   --td-radius-large: 10px;
   --td-shadow-1: 0 1px 2px rgba(17, 24, 39, 0.04), 0 1px 6px rgba(17, 24, 39, 0.05);
 
-  /* 业务侧可直接使用的变量 */
-  --tl-primary: #16a37a;
-  --tl-primary-dark: #0f8a66;
-  --tl-primary-light: #e6f6f0;
-  --tl-bg: #f5f7f9;
-  --tl-line: #eef0f2;
-  --tl-text-1: #1f2937;
-  --tl-text-2: #6b7280;
-  --tl-text-3: #9ca3af;
-  --tl-hover: #f3f6f5;
+  /* 业务侧可直接使用的变量:引用 TDesign 变量,暗色模式下自动跟着变 */
+  --tl-primary: var(--td-brand-color);
+  --tl-primary-dark: var(--td-brand-color-active);
+  --tl-primary-light: var(--td-brand-color-light);
+  --tl-bg: var(--td-bg-color-page);
+  --tl-surface: var(--td-bg-color-container);
+  --tl-surface-2: var(--td-bg-color-secondarycontainer);
+  --tl-line: var(--td-component-stroke);
+  --tl-text-1: var(--td-text-color-primary);
+  --tl-text-2: var(--td-text-color-secondary);
+  --tl-text-3: var(--td-text-color-placeholder);
+  /* 介于一级和二级文字之间:菜单项、表头 */
+  --tl-text-sub: #4b5563;
+  --tl-hover: var(--td-bg-color-container-hover);
+  --tl-row-hover: #f3f8f6;
   --tl-shadow: var(--td-shadow-1);
+  --tl-scrollbar: #d5dae0;
+  --tl-scrollbar-hover: #bfc6ce;
+}
+
+/*
+ * 暗色:<html theme-mode="dark">。TDesign 自带暗色中性色,这里只补品牌绿(它默认是蓝色)
+ * 和业务变量;主色 #1fa87b 在 #242424 卡片上对比度 >= 3:1。
+ */
+:root[theme-mode='dark'] {
+  --td-brand-color-1: #132b24;
+  --td-brand-color-2: #15352c;
+  --td-brand-color-3: #174437;
+  --td-brand-color-4: #145a44;
+  --td-brand-color-5: #127352;
+  --td-brand-color-6: #148b62;
+  --td-brand-color-7: #1b9a70;
+  --td-brand-color-8: #1fa87b;
+  --td-brand-color-9: #45bf95;
+  --td-brand-color-10: #7fd6b5;
+
+  --tl-text-sub: rgba(255, 255, 255, 0.72);
+  --tl-row-hover: #2a302e;
+  --td-shadow-1: 0 1px 2px rgba(0, 0, 0, 0.3), 0 1px 6px rgba(0, 0, 0, 0.25);
+  --tl-scrollbar: #4b4b4b;
+  --tl-scrollbar-hover: #5e5e5e;
+
+  color-scheme: dark;
 }
 
 * {
@@ -90,7 +122,7 @@ body .t-card__title {
 /* 页面内通用面板(与 t-card 同一观感,不想引入 t-card 时用) */
 .panel {
   padding: 20px;
-  background: #fff;
+  background: var(--tl-surface);
   border-radius: 8px;
   box-shadow: var(--tl-shadow);
 }
@@ -123,12 +155,12 @@ body .t-table {
 body .t-table th {
   height: 44px;
   font-weight: 600;
-  color: #4b5563;
-  background: #f7f9fa;
+  color: var(--tl-text-sub);
+  background: var(--tl-surface-2);
 }
 
 body .t-table--hoverable tbody tr:hover {
-  background-color: #f3f8f6;
+  background-color: var(--tl-row-hover);
 }
 
 /* ---------- 表单 ---------- */
@@ -183,12 +215,12 @@ body .t-tag {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d5dae0;
+  background: var(--tl-scrollbar);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #bfc6ce;
+  background: var(--tl-scrollbar-hover);
 }
 
 ::-webkit-scrollbar-track {

@@ -281,7 +281,7 @@ const shortcuts = computed(() => menuItems.value.filter((m) => m.path !== '/' &&
   align-items: center;
   gap: 14px;
   padding: 20px;
-  background: #fff;
+  background: var(--tl-surface);
   border-radius: 8px;
   box-shadow: var(--tl-shadow);
 }
@@ -297,23 +297,23 @@ const shortcuts = computed(() => menuItems.value.filter((m) => m.path !== '/' &&
 }
 
 .stat-card__icon.is-green {
-  color: #16a37a;
-  background: #e6f6f0;
+  color: var(--tl-primary);
+  background: rgba(22, 163, 122, 0.12);
 }
 
 .stat-card__icon.is-blue {
   color: #3b82f6;
-  background: #eaf2fe;
+  background: rgba(59, 130, 246, 0.12);
 }
 
 .stat-card__icon.is-orange {
   color: #f59e0b;
-  background: #fef4e2;
+  background: rgba(245, 158, 11, 0.14);
 }
 
 .stat-card__icon.is-purple {
   color: #8b5cf6;
-  background: #f1ecfe;
+  background: rgba(139, 92, 246, 0.14);
 }
 
 .stat-card__meta {
@@ -388,7 +388,7 @@ const shortcuts = computed(() => menuItems.value.filter((m) => m.path !== '/' &&
 
 .trend__tip {
   padding: 2px 8px;
-  color: #fff;
+  color: var(--tl-surface);
   background: var(--tl-text-1);
   border-radius: 4px;
 }
@@ -437,7 +437,7 @@ const shortcuts = computed(() => menuItems.value.filter((m) => m.path !== '/' &&
 }
 
 .logins__dot.is-fail {
-  background: #e5484d;
+  background: var(--td-error-color);
 }
 
 .logins__main {
@@ -491,7 +491,7 @@ const shortcuts = computed(() => menuItems.value.filter((m) => m.path !== '/' &&
 }
 
 .shortcut:hover {
-  background: #f7fbf9;
+  background: var(--tl-hover);
   border-color: var(--td-brand-color-3);
 }
 
