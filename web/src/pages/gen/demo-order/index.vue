@@ -31,6 +31,7 @@
       </t-button>
     </template>
 
+    <template #amount="{ row }">{{ formatMoney(row.amount, { fromFen: true }) }}</template>
     <template #is_paid="{ row }">
       <t-tag :theme="row.is_paid === 1 ? 'success' : 'default'" variant="light">
         {{ row.is_paid === 1 ? '是' : '否' }}
@@ -64,7 +65,15 @@
         <t-input-number v-model="form.quantity" />
       </t-form-item>
       <t-form-item label="订单金额" name="amount">
-        <t-input-number v-model="form.amount" />
+        <t-input-number
+          :value="form.amount / 100"
+          :decimal-places="2"
+          :min="0"
+          theme="normal"
+          suffix="元"
+          style="width: 200px"
+          @change="(v: unknown) => (form.amount = Math.round(Number(v || 0) * 100))"
+        />
       </t-form-item>
       <t-form-item label="已支付" name="is_paid">
         <t-radio-group v-model="form.is_paid">
@@ -100,6 +109,7 @@ import {
   type DemoOrderItem, type DemoOrderForm,
 } from '@/api/gen/demo_order';
 import { formatDate } from '@/utils/date';
+import { formatMoney } from '@/utils/money';
 
 const tableRef = ref<TablePlusExpose>();
 const query = reactive({ order_no: '', customer_name: '', is_paid: '' as string | number, pay_time_start: '', pay_time_end: '', });

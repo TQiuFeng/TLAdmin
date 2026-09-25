@@ -120,7 +120,7 @@ final class SystemConfigController extends BaseController
     public function securityRateLimit(): SecurityRateLimitVo
     {
         return SecurityRateLimitVo::from([
-            'per_second' => (int) $this->config->get('security.rate_limit.per_second', 10),
+            'per_second' => (int) $this->config->get('security.rate_limit.per_second', 30),
         ]);
     }
 

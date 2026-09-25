@@ -55,6 +55,84 @@ final class TestContext
         }
     }
 
+    private static ?bool $redisAvailable = null;
+
+    public function needsRedis(): void
+    {
+        if (self::$redisAvailable === null) {
+            try {
+                \app\common\cache\RedisClient::connection()->ping();
+                self::$redisAvailable = true;
+            } catch (Throwable) {
+                self::$redisAvailable = false;
+            }
+        }
+        if (!self::$redisAvailable) {
+            throw new TestSkipped('Redis 不可用');
+        }
+    }
+
+    /**
+     * 建一个测试管理员(用例结束物理删除,连同角色关联)。
+     *
+     * @param array $overrides 覆盖字段,如 status、dept_id、is_super
+     * @return array{id: int, username: string, password: string}
+     */
+    public function createAdmin(array $overrides = []): array
+    {
+        $this->needsDb();
+        $now = time();
+        $username = 't_admin_' . bin2hex(random_bytes(4));
+        $password = 'Pwd-' . bin2hex(random_bytes(6));
+        $id = (int) Db::table('tl_admin_user')->insertGetId($overrides + [
+            'username' => $username,
+            'password' => password_hash($password, PASSWORD_DEFAULT),
+            'nickname' => '测试管理员',
+            'is_super' => 0,
+            'status' => 1,
+            'dept_id' => 0,
+            'create_time' => $now,
+            'update_time' => $now,
+        ]);
+        $this->defer(static function () use ($id): void {
+            Db::table('tl_admin_user_role')->where('user_id', $id)->delete();
+            Db::table('tl_admin_user')->where('id', $id)->delete();
+        });
+
+        return ['id' => $id, 'username' => $username, 'password' => $password];
+    }
+
+    /**
+     * 建一个测试角色并分给用户(用例结束删除角色及其菜单、部门关联)。
+     *
+     * @param string[] $permissions 菜单/按钮/接口权限标识
+     * @param int[] $customDeptIds data_scope=custom 时的部门
+     */
+    public function createRole(int $userId, string $dataScope = 'all', array $permissions = [], array $customDeptIds = [], int $status = 1): int
+    {
+        $now = time();
+        $suffix = bin2hex(random_bytes(4));
+        $roleId = (int) Db::table('tl_admin_role')->insertGetId([
+            'name' => '测试角色' . $suffix, 'code' => 't_role_' . $suffix, 'data_scope' => $dataScope,
+            'sort' => 99, 'status' => $status, 'remark' => '', 'create_time' => $now, 'update_time' => $now,
+        ]);
+        foreach (Db::table('tl_admin_menu')->where('permission', 'in', $permissions ?: ['__none__'])->column('id') as $menuId) {
+            Db::table('tl_admin_role_menu')->insert(['role_id' => $roleId, 'menu_id' => $menuId]);
+        }
+        foreach ($customDeptIds as $deptId) {
+            Db::table('tl_admin_role_dept')->insert(['role_id' => $roleId, 'dept_id' => $deptId]);
+        }
+        Db::table('tl_admin_user_role')->insert(['user_id' => $userId, 'role_id' => $roleId]);
+        $this->defer(static function () use ($roleId): void {
+            Db::table('tl_admin_role_menu')->where('role_id', $roleId)->delete();
+            Db::table('tl_admin_role_dept')->where('role_id', $roleId)->delete();
+            Db::table('tl_admin_user_role')->where('role_id', $roleId)->delete();
+            Db::table('tl_admin_role')->where('id', $roleId)->delete();
+        });
+
+        return $roleId;
+    }
+
     /** 与 public/index.php 相同的容器绑定,其余自动装配 */
     public function make(string $class): object
     {

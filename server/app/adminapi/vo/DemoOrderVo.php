@@ -25,7 +25,7 @@ final class DemoOrderVo extends BaseVo
     #[ApiField('数量')]
     public int $quantity;
 
-    #[ApiField('订单金额(元)')]
+    #[ApiField('订单金额(分)')]
     public int $amount;
 
     #[ApiField('已支付:1是 0否')]

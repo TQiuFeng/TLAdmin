@@ -58,8 +58,14 @@ function gotoLogin(): void {
   }
 }
 
-/** 核心请求:返回业务 data,业务码非 0 时 reject ApiResult */
-export async function request<T = unknown>(options: RequestOptions): Promise<T> {
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * 核心请求:返回业务 data,业务码非 0 时 reject ApiResult。
+ * 429(限流)时查询类请求等一秒自动重试一次:限流按自然秒计数,下一秒窗口就清零了;
+ * 写操作不自动重试,避免重复提交。
+ */
+export async function request<T = unknown>(options: RequestOptions, attempt = 0): Promise<T> {
   const { silent, ...config } = options;
   try {
     const response = await instance.request(config);
@@ -86,6 +92,13 @@ export async function request<T = unknown>(options: RequestOptions): Promise<T> 
       }
       gotoLogin();
       return Promise.reject(body ?? error);
+    }
+
+    const method = String(config.method ?? 'get').toLowerCase();
+    if (status === 429 && attempt === 0 && (method === 'get' || method === 'head')) {
+      // 加一点随机延迟,避免同一批请求在同一秒里又一起撞上
+      await sleep(1000 + Math.random() * 300);
+      return request<T>(options, attempt + 1);
     }
 
     if (!silent) {

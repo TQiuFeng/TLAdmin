@@ -281,6 +281,7 @@ php tests/run.php Generator      # 只运行文件名包含 Generator 的测试
 
 cd web
 npm run dev                      # 开发
+npm test                         # 前端单元测试(Vitest)
 npm run build                    # 类型检查 + 生产构建
 ```
 
@@ -1124,7 +1125,7 @@ php bin/console gen:crud <表名> [--title=标题] [--force]
 | 演示商品 | `tl_demo_product` | 默认字段配置，CLI 一条命令生成；价格按分存、自动识别为金额 |
 | 演示文章 | `tl_demo_article` | 模糊/精确搜索、置顶开关、发布时间区间搜索、长文本不进列表 |
 | 演示客户 | `tl_demo_customer` | 多条件搜索、数字等级、下次跟进时间 |
-| 演示订单 | `tl_demo_order` | 订单号精确搜索、支付开关 + 支付时间区间搜索、没有状态字段的表 |
+| 演示订单 | `tl_demo_order` | 订单号精确搜索、金额按分存按元显示、支付开关 + 支付时间区间搜索、没有状态字段的表 |
 | 演示公告 | `tl_demo_notice` | 生效/失效两个时间字段、置顶 |
 
 样例数据和"演示中心"目录由 `database/seeders/sample_demo_data.php` 写入：只在表为空时写入，可重复执行。不需要演示时，删除对应菜单即可。

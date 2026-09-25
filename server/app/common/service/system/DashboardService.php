@@ -26,7 +26,8 @@ final class DashboardService
     /** @return array{stats: array, operation_trend?: array, recent_logins?: array} */
     public function overview(int $userId): array
     {
-        $can = fn (string $permission): bool => $this->authService->hasPermission($userId, $permission);
+        // 权限只查一次库,后面各块统计在内存里判断
+        $can = $this->authService->permissionChecker($userId);
         $todayStart = strtotime('today');
 
         $stats = [];

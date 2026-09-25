@@ -154,17 +154,27 @@ final class AuthService
     /** 校验权限标识;超管恒通过 */
     public function hasPermission(int $userId, string $permission): bool
     {
+        return $this->permissionChecker($userId)($permission);
+    }
+
+    /**
+     * 一次查出用户的权限,返回可反复调用的判断函数;同一请求要判断多个权限时用它,避免重复查库。
+     *
+     * @return \Closure(string): bool
+     */
+    public function permissionChecker(int $userId): \Closure
+    {
         $user = Db::table('tl_admin_user')->field('id, is_super')->where('id', $userId)->find();
         if (!$user) {
-            return false;
+            return static fn (string $permission): bool => false;
         }
         if ((int) $user['is_super'] === 1) {
-            return true;
+            return static fn (string $permission): bool => true;
         }
 
-        $permissions = array_column($this->menusForUser($userId, false), 'permission');
+        $permissions = array_flip(array_filter(array_column($this->menusForUser($userId, false), 'permission')));
 
-        return in_array($permission, $permissions, true);
+        return static fn (string $permission): bool => isset($permissions[$permission]);
     }
 
     private function menusForUser(int $userId, bool $isSuper): array

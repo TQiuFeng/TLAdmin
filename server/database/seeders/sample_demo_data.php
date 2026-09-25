@@ -94,14 +94,15 @@ return [
             ['name' => '南京墨石设计工作室', 'contact' => '郑设计', 'mobile' => '13800002007', 'source' => '转介绍', 'level' => 1, 'next_follow_time' => 0, 'status' => 0, 'remark' => '已流失'],
         ]);
 
+        // 金额按分存
         $orderPrefix = 'DO' . date('Ymd', $now);
         $fill('tl_demo_order', [
-            ['order_no' => $orderPrefix . '0001', 'customer_name' => '杭州云帆科技有限公司', 'goods_name' => '27 寸显示器', 'quantity' => 10, 'amount' => 18990, 'is_paid' => 1, 'pay_time' => $now - 5 * $day, 'remark' => ''],
-            ['order_no' => $orderPrefix . '0002', 'customer_name' => '深圳启明电子', 'goods_name' => '机械键盘', 'quantity' => 30, 'amount' => 13770, 'is_paid' => 1, 'pay_time' => $now - 4 * $day, 'remark' => '开专票'],
-            ['order_no' => $orderPrefix . '0003', 'customer_name' => '成都锦城餐饮管理', 'goods_name' => '人体工学椅', 'quantity' => 6, 'amount' => 7794, 'is_paid' => 1, 'pay_time' => $now - 2 * $day, 'remark' => ''],
-            ['order_no' => $orderPrefix . '0004', 'customer_name' => '北京知行教育', 'goods_name' => '无线蓝牙耳机', 'quantity' => 50, 'amount' => 9950, 'is_paid' => 0, 'pay_time' => 0, 'remark' => '等对方走流程'],
-            ['order_no' => $orderPrefix . '0005', 'customer_name' => '苏州恒达物流', 'goods_name' => 'USB-C 扩展坞', 'quantity' => 20, 'amount' => 4780, 'is_paid' => 0, 'pay_time' => 0, 'remark' => ''],
-            ['order_no' => $orderPrefix . '0006', 'customer_name' => '武汉青禾农业', 'goods_name' => '移动电源', 'quantity' => 100, 'amount' => 12900, 'is_paid' => 1, 'pay_time' => $now - 1 * $day, 'remark' => ''],
+            ['order_no' => $orderPrefix . '0001', 'customer_name' => '杭州云帆科技有限公司', 'goods_name' => '27 寸显示器', 'quantity' => 10, 'amount' => 1899000, 'is_paid' => 1, 'pay_time' => $now - 5 * $day, 'remark' => ''],
+            ['order_no' => $orderPrefix . '0002', 'customer_name' => '深圳启明电子', 'goods_name' => '机械键盘', 'quantity' => 30, 'amount' => 1377000, 'is_paid' => 1, 'pay_time' => $now - 4 * $day, 'remark' => '开专票'],
+            ['order_no' => $orderPrefix . '0003', 'customer_name' => '成都锦城餐饮管理', 'goods_name' => '人体工学椅', 'quantity' => 6, 'amount' => 779400, 'is_paid' => 1, 'pay_time' => $now - 2 * $day, 'remark' => ''],
+            ['order_no' => $orderPrefix . '0004', 'customer_name' => '北京知行教育', 'goods_name' => '无线蓝牙耳机', 'quantity' => 50, 'amount' => 995000, 'is_paid' => 0, 'pay_time' => 0, 'remark' => '等对方走流程'],
+            ['order_no' => $orderPrefix . '0005', 'customer_name' => '苏州恒达物流', 'goods_name' => 'USB-C 扩展坞', 'quantity' => 20, 'amount' => 478000, 'is_paid' => 0, 'pay_time' => 0, 'remark' => ''],
+            ['order_no' => $orderPrefix . '0006', 'customer_name' => '武汉青禾农业', 'goods_name' => '移动电源', 'quantity' => 100, 'amount' => 1290000, 'is_paid' => 1, 'pay_time' => $now - 1 * $day, 'remark' => ''],
         ]);
 
         $fill('tl_demo_notice', [

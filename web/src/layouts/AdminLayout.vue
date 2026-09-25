@@ -57,23 +57,31 @@
       </header>
 
       <nav class="layout-tabs">
-        <div
-          v-for="tab in tabs"
-          :key="tab.path"
-          class="layout-tab"
-          :class="{ active: tab.path === activePath }"
-          @click="onTabChange(tab.path)"
-        >
-          <span>{{ tab.title }}</span>
-          <close-icon v-if="tabs.length > 1" class="layout-tab__close" @click.stop="onTabRemove(tab.path)" />
+        <div class="layout-tabs__list">
+          <div
+            v-for="tab in tabs"
+            :key="tab.path"
+            class="layout-tab"
+            :class="{ active: tab.path === activePath }"
+            @click="onTabChange(tab.path)"
+            @mouseup.middle="tabs.length > 1 && onTabRemove(tab.path)"
+          >
+            <span>{{ tab.title }}</span>
+            <close-icon v-if="tabs.length > 1" class="layout-tab__close" @click.stop="onTabRemove(tab.path)" />
+          </div>
         </div>
+        <t-dropdown :options="tabMenuOptions" trigger="click" placement="bottom-right" @click="onTabMenuClick">
+          <button class="header-icon-btn layout-tabs__more" type="button" aria-label="标签操作">
+            <chevron-down-icon />
+          </button>
+        </t-dropdown>
       </nav>
 
       <main class="layout-content">
         <router-view v-slot="{ Component }">
           <!-- 页面多为多根节点(表格 + 弹窗),包一层 div,否则 Transition 无法执行离场动画,切换后内容区空白 -->
           <transition name="fade-slide" mode="out-in">
-            <div :key="route.path">
+            <div :key="`${route.path}#${reloadSeq}`">
               <component :is="Component" />
             </div>
           </transition>
@@ -191,13 +199,38 @@ const breadcrumbs = computed<string[]>(() => {
   return chain.length ? chain : [String(route.meta.title ?? '')];
 });
 
-// ---- 多标签页 ----
+// ---- 多标签页:存 sessionStorage,刷新页面后恢复;关掉浏览器标签页即清空 ----
 interface TabItem {
   path: string;
   title: string;
 }
 
-const tabs = ref<TabItem[]>([]);
+const TABS_KEY = 'tladmin:tabs';
+
+function readTabs(): TabItem[] {
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(TABS_KEY) ?? '[]');
+    return Array.isArray(saved) ? saved.filter((t) => typeof t?.path === 'string' && typeof t?.title === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+const tabs = ref<TabItem[]>(readTabs());
+
+watch(
+  tabs,
+  (value) => {
+    try {
+      sessionStorage.setItem(TABS_KEY, JSON.stringify(value));
+    } catch {
+      /* 存储不可用时只是刷新后不恢复,不影响使用 */
+    }
+  },
+  { deep: true },
+);
+
+const reloadSeq = ref(0);
 
 watch(
   () => route.path,
@@ -220,6 +253,39 @@ function onTabRemove(path: string): void {
   // 关掉当前页时跳到相邻标签
   if (path === route.path && tabs.value.length) {
     router.push(tabs.value[Math.min(index, tabs.value.length - 1)]!.path);
+  }
+}
+
+const tabMenuOptions: DropdownProps['options'] = [
+  { content: '刷新当前页', value: 'reload', divider: true },
+  { content: '关闭其他', value: 'others' },
+  { content: '关闭右侧', value: 'right' },
+  { content: '关闭全部', value: 'all' },
+];
+
+function onTabMenuClick(data: DropdownOption): void {
+  const current = tabs.value.find((t) => t.path === route.path);
+  switch (data.value) {
+    case 'reload':
+      reloadSeq.value++;
+      break;
+    case 'others':
+      tabs.value = current ? [current] : [];
+      break;
+    case 'right': {
+      const index = tabs.value.findIndex((t) => t.path === route.path);
+      if (index >= 0) tabs.value.splice(index + 1);
+      break;
+    }
+    case 'all':
+      // 回到首页,只留首页一个标签(首页标签由路由监听自动加回)
+      tabs.value = [];
+      if (route.path === '/' || route.path === '/dashboard') {
+        tabs.value = current ? [current] : [];
+      } else {
+        router.push('/');
+      }
+      break;
   }
 }
 
@@ -246,6 +312,11 @@ async function onUserMenuClick(data: DropdownOption): Promise<void> {
       body: '确定要退出当前账号吗?',
       onConfirm: async () => {
         await userStore.logout();
+        try {
+          sessionStorage.removeItem(TABS_KEY);
+        } catch {
+          /* 忽略 */
+        }
         dialog.destroy();
         router.replace('/login');
       },
@@ -462,10 +533,29 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 6px;
   height: 40px;
-  padding: 0 12px;
-  overflow-x: auto;
+  padding: 0 8px 0 12px;
   background: #fff;
   border-bottom: 1px solid var(--tl-line);
+}
+
+.layout-tabs__list {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.layout-tabs__list::-webkit-scrollbar {
+  display: none;
+}
+
+.layout-tabs__more {
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
 }
 
 .layout-tab {

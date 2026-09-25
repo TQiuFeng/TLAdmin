@@ -1,0 +1,82 @@
+# 持续集成:每次推送 / PR 跑后端测试(真实 MySQL、Redis、MongoDB)和前端测试 + 构建
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  backend:
+    name: 后端测试
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: tladmin
+        ports: ['3306:3306']
+        options: >-
+          --health-cmd="mysqladmin ping -proot" --health-interval=5s --health-timeout=5s --health-retries=20
+      redis:
+        image: redis:7
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd="redis-cli ping" --health-interval=5s --health-timeout=5s --health-retries=20
+      mongo:
+        image: mongo:7
+        ports: ['27017:27017']
+        options: >-
+          --health-cmd="mongosh --quiet --eval 'db.runCommand({ping:1})'" --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      # 配置走环境变量,不需要 .env 文件
+      APP_ENV: testing
+      APP_KEY: ci-only-key-not-secret
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_DATABASE: tladmin
+      DB_USERNAME: root
+      DB_PASSWORD: root
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+      MONGO_HOST: 127.0.0.1
+      MONGO_PORT: 27017
+      MONGO_DATABASE: tladmin
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: pdo_mysql, redis, mongodb, gd, pdo_sqlite, mbstring, openssl, curl, bcmath, zip
+          coverage: none
+      - name: 语法检查
+        run: find app config database tests bin -name '*.php' -print0 | xargs -0 -n1 php -l > /dev/null
+      - name: 迁移与初始化数据
+        run: |
+          php bin/console migrate
+          php bin/console seed
+      - name: 运行测试
+        run: php tests/run.php
+
+  frontend:
+    name: 前端测试与构建
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - name: 单元测试
+        run: npm test
+      - name: 类型检查与构建
+        run: npm run build

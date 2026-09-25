@@ -36,7 +36,7 @@
 
     <t-card title="接口限流" :bordered="false">
       <t-form label-width="140px">
-        <t-form-item label="每秒请求上限" help="按登录用户/IP 计数,0 表示不限流">
+        <t-form-item label="每秒请求上限" help="按登录用户/IP 每秒计数,0 表示不限流。默认 30;打开一个页面会并发好几个请求,不宜设太低">
           <t-input-number v-model="rateLimit" :min="0" :max="1000" />
         </t-form-item>
         <t-form-item>

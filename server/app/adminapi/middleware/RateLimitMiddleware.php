@@ -25,7 +25,7 @@ final class RateLimitMiddleware
 
     public function __invoke(Request $request, array $meta): ?Response
     {
-        $limit = (int) $this->config->get('security.rate_limit.per_second', 10);
+        $limit = (int) $this->config->get('security.rate_limit.per_second', 30);
         if ($limit <= 0) {
             return null;
         }
