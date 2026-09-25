@@ -164,7 +164,7 @@ C 端会员后台管理，与后台管理员账号体系分离。
     <tr><td rowspan="3">数据</td><td>MySQL 8</td><td>业务数据：管理员、角色、菜单、配置、会员等</td></tr>
     <tr><td>Redis</td><td>access / refresh token、登录失败计数、接口限流计数、队列</td></tr>
     <tr><td>MongoDB</td><td>操作日志、登录日志、第三方请求日志，按 request_id 检索</td></tr>
-    <tr><td rowspan="6">后台前端</td><td>Vue 3 + TypeScript</td><td>按后端菜单树生成动态路由，v-permission 控制按钮权限</td></tr>
+    <tr><td rowspan="6">前端</td><td>Vue 3 + TypeScript</td><td>按后端菜单树生成动态路由，v-permission 控制按钮权限</td></tr>
     <tr><td>Vite</td><td>开发代理到后端，构建产物可直接部署到 server/public/admin</td></tr>
     <tr><td>TDesign Vue Next</td><td>组件库；通用组件 TablePlus、FormDialog、UploadPlus 基于它封装</td></tr>
     <tr><td>Pinia</td><td>登录态、用户信息、菜单树、权限集合</td></tr>
