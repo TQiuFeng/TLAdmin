@@ -153,11 +153,18 @@ C 端会员后台管理，与后台管理员账号体系分离。
 
 ## 技术栈
 
-```text
-后端：PHP 8.2+、ThinkPHP 生态、think-orm、MySQL 8、Redis、MongoDB
-前端：Vue3、Vite、TypeScript、Pinia、Vue Router、Axios、TDesign Vue Next、dayjs、lodash-es
-第三方：yansongda/pay、EasyWeChat、EasySms、Guzzle、Carbon、pragmarx/google2fa、OSS/COS/七牛 SDK
-```
+| 部分 | 技术 | 说明 |
+|---|---|---|
+| 服务端 | PHP 8.2+<br>ThinkPHP 8<br>think-orm | 控制器方法上的注解同时生成路由、权限和 OpenAPI 文档；统一返回 code/message/data/request_id/timestamp，支持 JSON / XML |
+| 数据 | MySQL 8<br>Redis<br>MongoDB | MySQL 存业务数据；Redis 存 token、登录失败计数、接口限流计数和队列；MongoDB 存操作日志、登录日志、第三方请求日志 |
+| 后台前端 | Vue 3<br>TypeScript<br>Vite<br>TDesign Vue Next<br>Pinia / Vue Router / Axios | 按后端菜单树生成动态路由，v-permission 控制按钮；请求层统一带 token，401 自动刷新 token 后重放 |
+| 认证 | access + refresh token<br>pragmarx/google2fa | token 存 Redis，登录失败锁定；可开启 Google Authenticator 动态验证码 |
+| 支付 | yansongda/pay | 微信支付、支付宝统一 Service；密钥加密存库，接口返回脱敏 |
+| 微信 | EasyWeChat | 公众号配置，小程序登录与手机号一键授权 |
+| 短信 | EasySms | 阿里云、腾讯云，后台选哪家就用哪家 |
+| 存储 | 阿里云 OSS SDK<br>腾讯云 COS SDK<br>七牛 SDK | 后端签发上传凭证、前端直传云端，本地磁盘兜底 |
+| 工具库 | overtrue/pinyin<br>overtrue/php-opencc<br>6tail/lunar-php<br>bacon/bacon-qr-code<br>Carbon / Guzzle | 拼音、简繁转换、万年历与节假日、二维码、日期、HTTP；手机号 / IP 归属地、五级行政区划、敏感词读本地数据文件，不调用外部接口 |
+| 接口文档 | zircote/swagger-php<br>Swagger UI | 注解生成 OpenAPI，内置调试台，可设访问密码 |
 
 ## 项目结构
 
